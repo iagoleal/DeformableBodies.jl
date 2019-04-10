@@ -51,16 +51,15 @@ def ax2quaternion(v, theta):
 
 def getInertiaTensor(r, masses):
     # r = positions vectors
-    
     I = zeros((3,3))
     for i in range(0, len(masses)):
         I[0][0] += masses[i]*(r[i][1]*r[i][1] + r[i][2]*r[i][2])
         I[1][1] += masses[i]*(r[i][0]*r[i][0] + r[i][2]*r[i][2])
         I[2][2] += masses[i]*(r[i][0]*r[i][0] + r[i][1]*r[i][1])
 
-        I[0][1] += masses[i]*r[i][0]*r[i][1]
-        I[0][2] += masses[i]*r[i][0]*r[i][2]
-        I[1][2] += masses[i]*r[i][1]*r[i][2]
+        I[0][1] += -masses[i]*r[i][0]*r[i][1]
+        I[0][2] += -masses[i]*r[i][0]*r[i][2]
+        I[1][2] += -masses[i]*r[i][1]*r[i][2]
 
     I[1][0] = I[0][1]
     I[2][0] = I[0][2]
@@ -165,14 +164,12 @@ num_times= 400
 time = linspace(0.0, tmax, num_times)
 r = [0 for i in range(0,len(masses))]
 
-
-
 for i in range(0,len(masses)):
     r[i] = lambda t, i=i: r_0[i, :]
 
 
-tmax_r1 = tmax/20.0
-ang_max = -pi/6.0
+tmax_r1 = tmax/20.
+ang_max = -pi/6.
 freq = 2*pi/(tmax - tmax_r1)
 for i in (1,2,3,4):
     def ri(t, j=i):
@@ -182,7 +179,7 @@ for i in (1,2,3,4):
             rx = rotate( ax2quaternion(array([1,0,0]), ang_max), r_0[j, :] )
             axis = rotate( ax2quaternion(array([1,0,0]), ang_max), r_0[1, :] ) -  rotate( ax2quaternion(array([1,0,0]), ang_max), r_0[0, :] )
 
-            return rotate( ax2quaternion( axis, freq*(t - tmax_r1)), rx)    
+            return rotate( ax2quaternion( axis, freq*(t - tmax_r1)), rx)
     r[i] = ri
 
 for i in (5,6,7,8):
@@ -217,8 +214,8 @@ def particles(t):
 # # Equações de movimento:
 #
 # $$ \frac{dp}{dt}(t) = p(t) \times I^{-1}(t) \left( p(t) - L_0(t) \right) $$
-# $$ \omega = I^{-1} \left( p - L_0 \right) $$
-#
+    # $$ \omega = I^{-1} \left( p - L_0 \right) $$
+    #
 #
 # E dado $\omega \in \mathbb{R}^3$ podemos achar uma rotação $q$ tal que:
 #
@@ -294,10 +291,6 @@ def update_plot(num, positions, body_lines, ani_lines, sc):
         line._verts3d = positions[[sp,ep], :, num].T.tolist()
 
     sc._offsets3d = juggle_axes(positions[:,0, num], positions[:,1, num], positions[:,2, num], 'z')
-
-
-
-
     return sc
 
 #Create figure object and set animation
