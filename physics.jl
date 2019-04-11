@@ -52,5 +52,9 @@ function inertia_tensor(xs::Array{PointMass{T},1}) where T <: Real
 end
 
 @inline angular_momentum(xs::Array{PointMass{T},1}, vs::Array) where T<:Real =
-    sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs))
+    sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs) )
 
+function centralize(xs::Array{PointMass{T},1}) where T<: Real
+    cm = center_of_mass(xs)
+    map(r -> PointMass(r.mass, r.pos - cm), xs)
+end
