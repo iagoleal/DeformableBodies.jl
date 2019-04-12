@@ -1,6 +1,9 @@
-##########################
-#       Quaternions      #
-##########################
+module Quaternions
+
+export Quaternion,
+       normalize, normalize!,
+       ax2Quaternion,
+       rotate
 
 # We define quaternions to be a set of 4 real numbers.
 # Aftewards, we will define more structure such that
@@ -148,3 +151,4 @@ end
 # An alias to transform rotate a vector v
 # by an angle around an axis
 @inline rotate(v::Array{<:Real,1}; angle=0, axis=[0,0,0]) = rotate(ax2quaternion(axis, angle), v)
+end
