@@ -2,7 +2,7 @@ module Quaternions
 
 export Quaternion,
        normalize, normalize!,
-       ax2Quaternion,
+       axis2Quaternion,
        rotate
 
 # We define quaternions to be a set of 4 real numbers.
@@ -76,8 +76,13 @@ Quaternion(t::Real, v::Array{<:Real, 1 })      = Quaternion([t, v[1], v[2], v[3]
 # Quaternions form an involution algebra.
 # The conjugation operation is defined as $conj(re + im) = re - im$,
 # just as complex numbers
-@inline Base.conj(q::Quaternion)  = Quaternion(real(q), -imag(q))
-@inline Base.conj!(q::Quaternion) = for i = 2:length(q.q) q.q[i] *= -1 end
+@inline Base.conj(q::Quaternion) = Quaternion(real(q), -imag(q))
+@inline function Base.conj!(q::Quaternion)
+    for i = 2:length(q.q)
+        q.q[i] *= -1
+    end
+    return q
+end
 
 # It is also possible to talk about the norm of a quaternion.
 # Geometricaly, abs(q) represents the length of a quaternion
@@ -97,7 +102,7 @@ function normalize(q::Quaternion; tolerance=1e-5)
     if abs( magnitude2 - 1.0 ) < tolerance
         return q
     end
-    q / sqrt(magnitude2)
+    return q / sqrt(magnitude2)
 end
 
 function normalize!(q::Quaternion; tolerance=1e-5)
@@ -133,7 +138,7 @@ end
 # If we have a direction on the sphere and an angle θ,
 # it gives us an rotation matrix R(v,θ) which
 # may be represented according to
-function ax2quaternion(axis::Array{<:Real, 1},angle::Real)
+function axis2quaternion(axis::Array{<:Real, 1},angle::Real)
     v = imag(normalize(Quaternion(0,axis)))
     Quaternion(cos(angle/2), v*sin(angle/2))
 end
@@ -148,7 +153,7 @@ function rotate(q::Quaternion, v::Array{<:Real, 1})
     imag( q * Quaternion(0, v) * conj(q) )
 end
 
-# An alias to transform rotate a vector v
+# An alias to rotate a vector v
 # by an angle around an axis
-@inline rotate(v::Array{<:Real,1}; angle=0, axis=[0,0,0]) = rotate(ax2quaternion(axis, angle), v)
+@inline rotate(v::Array{<:Real,1}; angle=0, axis=[0,0,0]) = rotate(axis2quaternion(axis, angle), v)
 end
