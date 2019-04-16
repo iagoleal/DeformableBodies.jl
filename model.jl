@@ -58,6 +58,9 @@ for i in 2:9
     push!(r, ri)
 end
 
-t_0   = 0.
-t_max = 11.
-particles(t) = map(f -> f(t), r)
+model = Model( map(f -> f(t), r)
+             , 0.
+             , 11.
+             , one(Quaternion)
+             , zeros(3)
+             )
