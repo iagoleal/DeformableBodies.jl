@@ -6,7 +6,7 @@ export Quaternion,
        rotate
 
 # We define quaternions to be a set of 4 real numbers.
-# Aftewards, we will define more structure such that
+# Afterwards, we will define more structure such that
 # they form a normed division involution algebra.
 struct Quaternion{T} <:Number where T <: Real
     q::Array{T, 1}
@@ -18,10 +18,19 @@ struct Quaternion{T} <:Number where T <: Real
     end
 end
 
-# and add some others constructors for easiness.
-Quaternion(x::Array{T, 1}) where {T <: Real}   = Quaternion{T}(x)
-Quaternion(t::Real, x::Real, y::Real, z::Real) = Quaternion([t,x,y,z])
-Quaternion(t::Real, v::Array{<:Real, 1 })      = Quaternion([t, v[1], v[2], v[3]])
+Quaternion{T}(t::T, x::T=zero(T), y::T=zero(T), z::T=zero(T)) where {T<:Real} = Quaternion([t,x,y,z])
+Quaternion(x::Array{T, 1}) where {T <: Real} = Quaternion{T}(x)
+Quaternion(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) = Quaternion([t,x,y,z])
+Quaternion{T}(t::Real, x::Real=zero(T), y::Real=zero(T), z::Real=zero(T)) where T<:Real =
+    Quaternion{T}([convert(T,t), convert(T,x), convert(T,y), convert(T,z)])
+Quaternion(t::Real, v::Array{<:Real, 1 }) = Quaternion([t, v[1], v[2], v[3]])
+Quaternion{T}(z::Complex{T}) where T = Quaternion{T}(real(z), imag(z))
+Quaternion(z::Complex) = Quaternion(real(z), imag(z))
+
+promote_rule(::Type{Quaternion{T}}, ::Type{S}) where {T<:Real,S<:Real} =
+    Quaternion{promote_type(T,S)}
+promote_rule(::Type{Quaternion{T}}, ::Type{Quaternion{S}}) where {T<:Real,S<:Real} =
+    Quaternion{promote_type(T,S)}
 
 #######################
 # Quaternion algebra  #
@@ -32,11 +41,6 @@ Quaternion(t::Real, v::Array{<:Real, 1 })      = Quaternion([t, v[1], v[2], v[3]
 # That is, we define a sum between Quaternions
 # as the sum of their components
 @inline Base.:+(a::Quaternion, b::Quaternion) = Quaternion(a.q + b.q)
-
-# and define a neuter element given by the function
-@inline Base.zero(a::Type{Quaternion{T}}) where T = Quaternion{T}([zero(T),zero(T),zero(T),zero(T)])
-@inline Base.zero(a::Type{Quaternion})            = zero(Quaternion{Int64})
-@inline Base.zero(a::Quaternion{T})       where T = zero(Quaternion{T})
 
 # We also give the quaternions a scalar mutiplication structure given by
 @inline Base.:*(k::Real, q::Quaternion) = Quaternion(k * q.q)
@@ -61,11 +65,6 @@ Quaternion(t::Real, v::Array{<:Real, 1 })      = Quaternion([t, v[1], v[2], v[3]
     , q1.q[1]*q2.q[3] + q1.q[3]*q2.q[1] + q1.q[4]*q2.q[2] - q1.q[2]*q2.q[4]
     , q1.q[1]*q2.q[4] + q1.q[4]*q2.q[1] + q1.q[2]*q2.q[3] - q1.q[3]*q2.q[2]
     ])
-
-# The multiplication of quaternions has an identity element given by
-@inline Base.one(a::Type{Quaternion{T}}) where T = Quaternion{T}([one(T),zero(T),zero(T),zero(T)])
-@inline Base.one(a::Type{Quaternion})            = one(Quaternion{Int64})
-@inline Base.one(a::Quaternion{T})       where T = one(Quaternion{T})
 
 # Analogous to the Complex numbers,
 # we define the real part of q by
