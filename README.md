@@ -1,8 +1,28 @@
-# Falling cat simulator
-Little simulation of a falling cat I made for my scientific initiation.
-I still have to work a little more on this code.
+# Deformable body dynamics simulator
 
-The main goal is to upgrade it to a general falling body simulator,
-where the user just have the enter the points and initial trajectories and the program will do the rest.
+## Dependencies
+- Julia 1.1.0 (or greater)
+- DifferentialEquations.jl
+- Plots.jl + some plotting backend
 
-(no real cats where harmed during the process of getting the empirical data)
+## How to use
+
+Define a new _Model_ and run
+
+```julia
+prob = constructProblem(model)
+solution = ODE.solve(prob)
+```
+
+## Mathematics behind the program
+_Geometry goes here._
+
+## TODO
+
+- Write better documentation;
+- Plotting utilities;
+- Organize main file;
+- Find trajectory who optimizes energy from a parametrized family.
+
+## Disclaimer
+No real cats were harmed during the development of this program.
