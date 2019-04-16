@@ -2,14 +2,6 @@
 # Example of model: falling cat as a deformable body #
 ######################################################
 
-#= A model consists of a struct with
-a begining time;
-an ending time;
-a array of one-parameter functions
-from time to point masses:
-r[i] :: Real -> PointMass
-=#
-
 # Initial values for the body
 # CM fixed at origin
 const r_0 = centralize(
@@ -25,9 +17,9 @@ const r_0 = centralize(
     ])
 
 # Define vector of trajectories
-r = []
+bodies = []
 # Cat's center does not move
-push!(r, t -> r_0[1])
+push!(bodies, t -> r_0[1])
 
 # Other parts move according to given rule
 const tmax = 10.0
@@ -55,10 +47,10 @@ for i in 2:9
                 rotate(rx, axis=ax, angle=freq*(t-tmax_r1))
                 )
     end
-    push!(r, ri)
+    push!(bodies, ri)
 end
 
-model = Model( map(f -> f(t), r)
+model = Model( bodies
              , 0.
              , 11.
              , one(Quaternion)
