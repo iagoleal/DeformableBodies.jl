@@ -8,11 +8,11 @@ using Main.Quaternions
 
 include("physics.jl")
 # Plotting utilities
-#= include("plot.jl") =#
+#= include("plots.jl") =#
 
 # Struct to store the problem data before solving
 struct Model
-    trajectories::Array{Any,1}   # Particle Trajectories
+    trajectories               # Particle Trajectories
     t_min::Float64             # Initial time
     t_max::Float64             # Ending time
     q_0  ::Quaternion{Float64} # Initial Rotation
@@ -32,18 +32,20 @@ function eq_of_motion(du,u,bodies,t)
     dq = 0.5 * q * Quaternion(0, ω)
     dp = (Iinv*p) × (p-L)
 
-    du[1:4] .= dq.q ; du[5:end] .= dp
+    du[1:4] .= dq.q
+    du[5:end] .= dp
+    return du
 end
 
 @inline constructProblem(m::Model) =
     ODE.ODEProblem(eq_of_motion
                   , vcat(m.q_0.q, m.p_0)
                   , (m.t_min, m.t_max)
-                  , m.bodies
-                 )
+                  , m.trajectories
+                  )
 
 # Example model
-include("model.jl")
+# include("examples/falling-cat.jl")
 
 # prob = constructProblem(model)
 # sol = ODE.solve(prob)
