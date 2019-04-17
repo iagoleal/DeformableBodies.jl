@@ -58,3 +58,9 @@ function centralize(xs::Array{PointMass{T},1}) where T<: Real
     cm = center_of_mass(xs)
     map(r -> PointMass(r.mass, r.pos - cm), xs)
 end
+
+import Main.Quaternions: rotate
+
+@inline rotate(x::PointMass; angle=0, axis=[0,0,0]) = let a = angle, b =axis
+        PointMass(x.mass, rotate(x.pos, angle=a, axis=b))
+end
