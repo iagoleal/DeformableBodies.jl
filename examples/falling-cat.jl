@@ -36,16 +36,10 @@ for i in 2:9
     end
     ri(t) = let j = i
         if t < tmax_r1
-            return PointMass(
-                r_0[j].mass,
-                rotate(r_0[j].pos, axis=e_1, angle=t*θmax/tmax_r1)
-                )
+            rotate(r_0[j], axis=e_1, angle=t*θmax/tmax_r1)
         end
             rx = rotate(r_0[j].pos, axis=e_1, angle=θmax)
-            return PointMass(
-                r_0[j].mass,
-                rotate(rx, axis=ax, angle=freq*(t-tmax_r1))
-                )
+            rotate(rx, axis=ax, angle=freq*(t-tmax_r1))
     end
     push!(bodies, ri)
 end
