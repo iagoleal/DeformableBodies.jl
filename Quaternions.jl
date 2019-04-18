@@ -23,7 +23,7 @@ export imagq,
 """
 struct Quaternion{T} <:Number where T <: Real
     q::Array{T, 1}
-    function Quaternion{T}(x::Vector) where T <: Real
+    function Quaternion{T}(x::AbstractVector) where T <: Real
         if length(x) == 4
             new(x)
         elseif length(x) == 3
@@ -37,9 +37,9 @@ end
 Quaternion{T}(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) where {T <: Real} =
     Quaternion{T}([t,x,y,z])
 
-Quaternion(x::Vector{T}) where {T <: Real} = Quaternion{T}(x)
+Quaternion(x::AbstractVector{T}) where {T <: Real} = Quaternion{T}(x)
 Quaternion(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) = Quaternion([t,x,y,z])
-Quaternion(t::Real, v::Vector{<:Real}) = Quaternion([t; v])
+Quaternion(t::Real, v::AbstractVector{<:Real}) = Quaternion([t; v])
 
 Quaternion{T}(q::Quaternion) where T <: Real = Quaternion{T}(q.q)
 Quaternion(q::Quaternion) = q
@@ -262,7 +262,7 @@ Receives an axis `v` and angle `θ`
 and returns the quaternion
 who corresponds to a rotation of `θ` around `v`.
 """
-function axis2quaternion(ax::Array{<:Real, 1},angle::Real)
+function axis2quaternion(ax::AbstractVector,angle::Real)
     if length(ax) != 3
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
@@ -277,17 +277,17 @@ Rotate a vector `v` by a quaternion `q`.
 The quaternion may be given directly
 or as an axis and an angle.
 """
-function rotate(q::Quaternion, v::Vector{<:Real})
+function rotate(q::Quaternion, v::AbstractVector)
     if length(v) != 3
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
     q = normalize(q)
     imag( q * Quaternion(0, v) * conj(q) )
 end
-@inline function rotate( v::Vector{T}
-                       ; angle=zero(T)
-                       , axis=[zero(T), zero(T), one(T)]
-                       ) where T
+@inline function rotate( v::AbstractVector
+                       ; angle=0
+                       , axis=[0, 0, 1]
+                       )
     rotate(axis2quaternion(axis, angle), v)
 end
 

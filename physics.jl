@@ -2,7 +2,7 @@
 struct PointMass{T} <:Any where T <: Real
     mass::T
     pos::Vector{T}
-    function PointMass{T}(m::T, x::Vector{T}) where T <: Real
+    function PointMass{T}(m::T, x::Vector) where T <: Real
         if m <= 0
             error("Error: negative mass given.")
         end
