@@ -4,7 +4,7 @@ ODE = OrdinaryDiffEq
 
 # Mathematical and physical definitions and methods
 include("Quaternions.jl")
-using Main.Quaternions
+using .Quaternions
 
 include("physics.jl")
 # Plotting utilities

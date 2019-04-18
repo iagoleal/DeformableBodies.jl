@@ -24,7 +24,7 @@ PointMass(m::T, x::Vector{T}) where {T <: Real} = PointMass{T}(m,x)
     ]
 @inline a × b = cross(a,b)
 
-function center_of_mass(xs::Array{PointMass{T}, 1}) where T <: Real
+function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
     cm = zeros(3)
     total_mass = 0.
     for x in xs
@@ -34,7 +34,7 @@ function center_of_mass(xs::Array{PointMass{T}, 1}) where T <: Real
     return cm / total_mass
 end
 
-function inertia_tensor(xs::Array{PointMass{T},1}) where T <: Real
+function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real
     I = zeros(3,3)
     for x in xs
         I[1,1] += x.mass*( x.pos[2]^2 + x.pos[3]^2 )
@@ -51,15 +51,16 @@ function inertia_tensor(xs::Array{PointMass{T},1}) where T <: Real
     return I
 end
 
-@inline angular_momentum(xs::Array{PointMass{T},1}, vs::Array) where T<:Real =
+@inline angular_momentum(xs::AbstractArray{PointMass{T},1}, vs::AbstractArray) where T<:Real =
     sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs) )
 
-function centralize(xs::Array{PointMass{T},1}) where T<: Real
+function centralize(xs::AbstractArray{PointMass{T},1}) where T<: Real
     cm = center_of_mass(xs)
     map(r -> PointMass(r.mass, r.pos - cm), xs)
 end
 
-import Main.Quaternions: rotate
+# Extend Quaternion.rotate to deal with point masses
+import .Quaternions: rotate
 
 @inline rotate(x::PointMass; angle=0, axis=[0,0,0]) = let a = angle, b =axis
         PointMass(x.mass, rotate(x.pos, angle=a, axis=b))
