@@ -17,7 +17,7 @@ const r_0 = centralize(
     ])
 
 # Define vector of trajectories
-bodies = []
+bodies = Array{Function, 1}()
 # Cat's center does not move
 push!(bodies, t -> r_0[1])
 
@@ -37,16 +37,20 @@ for i in 2:9
     ri(t) = let j = i
         if t < tmax_r1
             rotate(r_0[j], axis=e_1, angle=t*θmax/tmax_r1)
-        end
-            rx = rotate(r_0[j].pos, axis=e_1, angle=θmax)
+        elseif tmax_r1 < t < tmax
+            rx = rotate(r_0[j], axis=e_1, angle=θmax)
             rotate(rx, axis=ax, angle=freq*(t-tmax_r1))
+        else
+            rx = rotate(r_0[j], axis=e_1, angle=θmax)
+            rotate(rx, axis=ax, angle=freq*(tmax-tmax_r1))
+        end
     end
     push!(bodies, ri)
 end
 
 model = Model( bodies
              , 0.
-             , 11.
+             , 10.
              , one(Quaternion)
              , zeros(3)
              )

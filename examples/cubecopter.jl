@@ -31,7 +31,6 @@ const tmax = 5.0
 const ω    = 2*π/tmax
 const e_1  = [0., 0., 1.]
 for x in r_0[end-1:end]
-    println(x)
     push!(bodies, let x=x; t -> rotate(x, axis=e_1, angle=ω*t); end)
 end
 
