@@ -11,10 +11,12 @@ struct Model
     p_0         ::Array{Float64,1}    # Initial Angular Momentum
 end
 
-function eq_of_motion(du,u,bodies,t)
+function eq_of_motion!(du,u,bodies,t)
     q = Quaternion(u[1:4])
     p = u[5:end]
-    r = t .|> bodies
+    # Change particles to SoR with CM at origin
+    r = t .|> bodies |> centralize
+    # Velocities must be calculated using a fixed SoR, so we don't centralize here
     v = velocity(bodies, t)
     Iinv = (inv ∘ inertia_tensor)(r)
     L = angular_momentum(r, v)
@@ -29,7 +31,7 @@ function eq_of_motion(du,u,bodies,t)
 end
 
 @inline construct_problem(m::Model) =
-    ODE.ODEProblem(eq_of_motion
+    ODE.ODEProblem(eq_of_motion!
                   , vcat(m.q_0.q, m.p_0)
                   , (m.t_min, m.t_max)
                   , m.trajectories
@@ -37,7 +39,12 @@ end
 
 function solve(m::Model)
     prob = construct_problem(m)
-    solution = ODE.solve(prob)
+    solution = ODE.solve( prob
+                        #= , alg_hints=[:auto] =#
+                        , ODE.Tsit5() # Solver
+                        , reltol=1e-8
+                        , abstol=1e-8
+                        )
 
     # Evolution of rotations
     R(t) = Quaternion(solution(t)[1:4])
