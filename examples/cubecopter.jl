@@ -1,11 +1,11 @@
 ################################
 # Example of model: Cubecopter #
 ################################
-
 #=
    8-points standing cube coupled
    with a 2-point moving helix
 =#
+using DeformableBodies
 
 const r_0 = centralize(
     [ PointMass(1., [ 1.,  1.,  0.])
@@ -40,3 +40,7 @@ model = Model( bodies
              , one(Quaternion)
              , zeros(3)
              )
+
+rotbodies, L = solve(model)
+
+println("Now test the difference between the variables `bodies` and `rotbodies`!")

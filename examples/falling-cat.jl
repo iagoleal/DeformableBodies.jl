@@ -1,6 +1,7 @@
 ######################################################
 # Example of model: falling cat as a deformable body #
 ######################################################
+using DeformableBodies
 
 # Initial values for the body
 # CM fixed at origin
@@ -54,3 +55,7 @@ model = Model( bodies
              , one(Quaternion)
              , zeros(3)
              )
+
+rotbodies, L = solve(model)
+
+println("Now test the difference between the variables `bodies` and `rotbodies`!")
