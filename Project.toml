@@ -1,0 +1,13 @@
+name = "DeformableBodies"
+uuid = "e53d2b94-6236-11e9-2d7b-535d79ecd3d3"
+authors = ["Iago Leal"]
+version = "0.0.1"
+
+[deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+
+[compat]
+julia = ">= 1.1.0"
+DifferentialEquations = "6.3.0"
+Plots = "0.24.0"

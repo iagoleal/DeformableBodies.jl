@@ -2,14 +2,6 @@
 import DifferentialEquations.OrdinaryDiffEq
 ODE = OrdinaryDiffEq
 
-# Mathematical and physical definitions and methods
-include("Quaternions.jl")
-using .Quaternions
-
-include("physics.jl")
-# Plotting utilities
-#= include("plots.jl") =#
-
 # Struct to store the problem data before solving
 struct Model
     trajectories::Array{Function,1}   # Particle Trajectories
@@ -55,8 +47,3 @@ function solve(m::Model)
 
     return rotbodies, momentum
 end
-
-# # Usage
-# model = include("examples/falling-cat.jl")
-# x, p  = solve(model)
-# # Now compare the result `x` with `model.trajectories`
