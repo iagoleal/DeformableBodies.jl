@@ -1,4 +1,10 @@
 # A PointMass is a mass at a given point on space (R^3).
+"""
+    PointMass(m, x)
+
+Wrapper around a mass
+and a position on `R^3`.
+"""
 struct PointMass{T} <:Any where T <: Real
     mass::T
     pos::Vector{T}
@@ -24,6 +30,12 @@ PointMass(m::T, x::Vector{T}) where {T <: Real} = PointMass{T}(m,x)
     ]
 @inline a × b = cross(a,b)
 
+"""
+    center_of_mass(xs)
+
+Gets a system of [`PointMass`](@ref)es and returns their
+center of mass.
+"""
 function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
     cm = zeros(3)
     total_mass = 0.
@@ -65,7 +77,7 @@ function velocity(bodies::Union{Function, AbstractVector{Function}}, t; ε=1e-6)
 end
 
 # Extend Quaternion.rotate to deal with point masses
-import .Quaternions: rotate
+using .Quaternions: rotate
 
 @inline rotate(x::PointMass; angle=0, axis=[0,0,0]) = let a = angle, b =axis
         PointMass(x.mass, rotate(x.pos, angle=a, axis=b))

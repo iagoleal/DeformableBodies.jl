@@ -1,9 +1,9 @@
 module Quaternions
 
-import Base: promote_rule, widen, float, big, show
-import Base: ==, +, -, *, /, \
-import Base: isreal, isinteger, isfinite, isnan, isinf
-import Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
+using Base: promote_rule, widen, float, big, show
+using Base: ==, +, -, *, /, \
+using Base: isreal, isinteger, isfinite, isnan, isinf
+using Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
 
 export Quaternion
 export imagq,
@@ -19,7 +19,7 @@ export imagq,
 """
     Quaternion{T<:Real} <: Number
 
-    Quaternion type with components of type `T`.
+Quaternion type with components of type `T`.
 """
 struct Quaternion{T} <:Number where T <: Real
     q::Array{T, 1}
@@ -73,9 +73,10 @@ Base.big(q::Quaternion{T}) where {T<:Real} = Quaternion{big(T)}(q)
 """
     imagq(q)
 
-Returns imaginary part of quaternion `q`
-as a quaternion.
+Returns imaginary part of [`Quaternion`](@ref)
+as a [`Quaternion`](@ref) with no real part.
 
+# Examples
 ```jldoctest
 julia> a = Quaternion(1,2,3,4)
 1 + 2i + 3j + 4k
@@ -259,7 +260,7 @@ end
     axis2quaternion(axis, angle)
 
 Receives an axis `v` and angle `θ`
-and returns the quaternion
+and returns the [`Quaternion`](@ref)
 who corresponds to a rotation of `θ` around `v`.
 """
 function axis2quaternion(ax::AbstractVector,angle::Real)
