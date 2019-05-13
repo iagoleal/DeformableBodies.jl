@@ -21,7 +21,7 @@ const r_0 = centralize(
     ])
 
 # Define vector of trajectories
-bodies = Array{Function,1}()
+bodies = Function[]
 for x in r_0[1:end-2]
     push!(bodies, let y=x; t -> y;end)
 end

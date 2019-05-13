@@ -18,7 +18,7 @@ const r_0 = centralize(
     ])
 
 # Define vector of trajectories
-bodies = Array{Function, 1}()
+bodies = Function[]
 # Cat's center does not move
 push!(bodies, t -> r_0[1])
 
