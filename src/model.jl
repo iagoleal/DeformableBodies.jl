@@ -1,6 +1,5 @@
-#!/usr/bin/env julia
-import DifferentialEquations.OrdinaryDiffEq
-ODE = OrdinaryDiffEq
+import OrdinaryDiffEq
+const ODE = OrdinaryDiffEq
 
 # Struct to store the problem data before solving
 struct Model
