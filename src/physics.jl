@@ -47,21 +47,26 @@ function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
 end
 
 function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real
-    I = zeros(3,3)
-    for x in xs
-        I[1,1] += x.mass*( x.pos[2]^2 + x.pos[3]^2 )
-        I[2,2] += x.mass*( x.pos[1]^2 + x.pos[3]^2 )
-        I[3,3] += x.mass*( x.pos[1]^2 + x.pos[2]^2 )
+    id = one(Array{T}(undef, 3, 3))
 
-        I[1,2] += -x.mass*x.pos[1]*x.pos[2]
-        I[1,3] += -x.mass*x.pos[1]*x.pos[3]
-        I[2,3] += -x.mass*x.pos[2]*x.pos[3]
-    end
-    I[2,1] = I[1,2]
-    I[3,1] = I[1,3]
-    I[3,2] = I[2,3]
-    return I
+    return sum(x.mass * (x.pos'x.pos * id - kron(x.pos',x.pos)) for x in xs)
 end
+#= function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real =#
+    #= I = zeros(3,3) =#
+    #= for x in xs =#
+    #=     I[1,1] += x.mass*( x.pos[2]^2 + x.pos[3]^2 ) =#
+    #=     I[2,2] += x.mass*( x.pos[1]^2 + x.pos[3]^2 ) =#
+    #=     I[3,3] += x.mass*( x.pos[1]^2 + x.pos[2]^2 ) =#
+
+    #=     I[1,2] += -x.mass*x.pos[1]*x.pos[2] =#
+    #=     I[1,3] += -x.mass*x.pos[1]*x.pos[3] =#
+    #=     I[2,3] += -x.mass*x.pos[2]*x.pos[3] =#
+    #= end =#
+    #= I[2,1] = I[1,2] =#
+    #= I[3,1] = I[1,3] =#
+    #= I[3,2] = I[2,3] =#
+    #= return I =#
+#= end =#
 
 @inline angular_momentum(xs::AbstractArray{PointMass{T},1}, vs::AbstractArray) where T<:Real =
     sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs) )
