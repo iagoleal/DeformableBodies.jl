@@ -41,6 +41,8 @@ model = Model( bodies
              , zeros(3)
              )
 
-rotbodies, L = solve(model)
+_, rotations, momentum = solve!(model)
 
-println("Now test the difference between the variables `bodies` and `rotbodies`!")
+println("Trajectories are stored on the following variables:")
+println("Body's internal frame: model.trajectories")
+println("Inertial frame       : model.inertial")

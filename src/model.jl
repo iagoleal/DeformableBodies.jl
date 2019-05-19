@@ -47,13 +47,12 @@ end
                   , m.trajectories
                   )
 
-function solve(m::Model)
+function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     prob = construct_problem(m)
-    solution = ODE.solve( prob
-                        #= , alg_hints=[:auto] =#
-                        , ODE.Tsit5() # Solver
-                        , reltol=1e-8
-                        , abstol=1e-8
+    solution = ODE.solve(prob
+                        , solver
+                        , reltol=reltol
+                        , abstol=abstol
                         )
     # Evolution of rotations
     R(t) = Quaternion(solution(t)[1:4])

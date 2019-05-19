@@ -3,7 +3,7 @@
     PointMass(m, x)
 
 Wrapper around a mass
-and a position on `R^3`.
+and a position on ``R^3``.
 """
 struct PointMass{T} <:Any where T <: Real
     mass::T

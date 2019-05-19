@@ -56,6 +56,8 @@ model = Model( bodies
              , zeros(3)
              )
 
-rotbodies, L = solve(model)
+rotbodies, R, L = solve!(model)
 
-println("Now test the difference between the variables `bodies` and `rotbodies`!")
+println("Trajectories are stored on the following variables:")
+println("Cat's internal frame: model.trajectories")
+println("Inertial frame      : model.inertial")

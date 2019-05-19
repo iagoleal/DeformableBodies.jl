@@ -25,7 +25,7 @@ export centralize,
 include("model.jl")
 
 export Model
-export solve
+export solve!
 # Plotting utilities
 #= include("plots.jl") =#
 
