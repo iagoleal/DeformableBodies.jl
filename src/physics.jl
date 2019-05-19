@@ -73,7 +73,7 @@ end
 
 # Velocity of a set of trajectories
 function velocity(bodies::Union{Function, AbstractVector{Function}}, t; ε=1e-6)
-    return map( (a,b) -> (a.pos - b.pos)/ ε, (t+ε) .|> bodies , (t-ε) .|> bodies )
+    return map((a,b) -> (a.pos - b.pos) / (2*ε), (t+ε) .|> bodies , (t-ε) .|> bodies)
 end
 
 # Extend Quaternion.rotate to deal with point masses
