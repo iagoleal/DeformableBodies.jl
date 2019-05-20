@@ -26,7 +26,9 @@ include("model.jl")
 
 export Model
 export solve!
-# Plotting utilities
-#= include("plots.jl") =#
 
+# Plotting utilities
+include("plots.jl")
+
+export plotmodel
 end
