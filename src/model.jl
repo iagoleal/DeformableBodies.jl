@@ -3,12 +3,12 @@ const ODE = OrdinaryDiffEq
 
 # Struct to store the problem data before solving
 mutable struct Model
-    trajectories::Function            # Particle Trajectories
-    t_min       ::Float64             # Initial time
-    t_max       ::Float64             # Ending time
-    q_0         ::Quaternion{Float64} # Initial Rotation
-    p_0         ::Array{Float64,1}    # Initial Angular Momentum
-    inertial    ::Function            # Trajectories on Inertial Frame
+    bodyframe    ::Function            # Trajectories on body frame
+    t_min        ::Float64             # Initial time
+    t_max        ::Float64             # Ending time
+    q_0          ::Quaternion{Float64} # Initial Rotation
+    p_0          ::Array{Float64,1}    # Initial Angular Momentum
+    inertialframe::Function            # Trajectories on inertial frame
     Model(trjs, t0, tf, q_0, p_0) = new(trjs, t0, tf, q_0, p_0)
 end
 
@@ -44,7 +44,7 @@ end
     ODE.ODEProblem(eq_of_motion!
                   , vcat(m.q_0.q, m.p_0)
                   , (m.t_min, m.t_max)
-                  , m.trajectories
+                  , m.bodyframe
                   )
 
 function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
@@ -59,6 +59,6 @@ function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     # Evolution of angular momentum
     momentum(t) = solution(t)[5:end]
     # Store solution on model
-    m.inertial = t -> [PointMass(x.mass, rotate(R(t), x.pos)) for x in m.trajectories(t)]
-    return m.inertial, R, momentum
+    m.inertialframe = t -> [PointMass(x.mass, rotate(R(t), x.pos)) for x in m.bodyframe(t)]
+    return m.inertialframe, R, momentum
 end

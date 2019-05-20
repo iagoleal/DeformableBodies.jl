@@ -59,5 +59,5 @@ model = Model( bodies
 rotbodies, R, L = solve!(model)
 
 println("Trajectories are stored on the following variables:")
-println("Cat's internal frame: model.trajectories")
-println("Inertial frame      : model.inertial")
+println("Cat's internal frame: model.bodyframe")
+println("Inertial frame      : model.inertialframe")

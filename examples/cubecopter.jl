@@ -44,5 +44,5 @@ model = Model( bodies
 _, rotations, momentum = solve!(model)
 
 println("Trajectories are stored on the following variables:")
-println("Body's internal frame: model.trajectories")
-println("Inertial frame       : model.inertial")
+println("Body's internal frame: model.bodyframe")
+println("Inertial frame       : model.inertialframe")
