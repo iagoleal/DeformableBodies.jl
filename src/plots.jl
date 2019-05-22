@@ -1,11 +1,40 @@
 import Plots
 
 # Plot a single body
-function plotbody(r; title="")
-    local pos = hcat((x.pos for x in r)...)
+function plotbody!(plt, body)
+    local pos = hcat((x.pos for x in body)...)
     x,y,z = pos[1,:], pos[2,:], pos[3,:]
-    Plots.scatter(x, y, z, seriestype=:scatter,
-                           title=title)
+    Plots.plot!(plt, x, y, z,
+                seriestype=:scatter
+               )
+    return plt
+end
+
+# Plot lines connecting different point masses
+function plotbodylines!(plt, body, lines; linecolor=:black)
+    for l in lines
+        # No point in drawing a line with length zero...
+        l[1] == l[2] && continue
+        x  = [body[l[1]].pos body[l[2]].pos]
+        Plots.plot!(plt, x[1,:], x[2,:], x[3,:],
+                    seriestype=:path3d,
+                    linecolor=linecolor,
+                    leg=nothing
+                   )
+    end
+    return plt
+end
+
+# Entire process for each single plot
+@inline function plot_process(data, bodylines; title="")
+    plt = Plots.plot3d(title=title)
+    plotbody!(plt, data)
+    if bodylines != nothing
+        plotbodylines!(plt, data, bodylines,
+                       linecolor=:black
+                      )
+    end
+    return plt
 end
 
 """
@@ -19,13 +48,15 @@ The aditional arguments currently available are
 - `duration`: duration of animation in seconds.
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
 - `backend`: Which Plots.jl backend to use.
+- `bodylines`: Array of points pairs. Storages the data about what points should be linked.
 """
 function plotmodel( m::Model
                     , SoR=:bodyframe # System of Reference
-                    ; fps = 15
+                    ; fps=15
                     , duration=5.0
                     , saveas=nothing
                     , backend=nothing
+                    , bodylines=nothing
                     )
     if backend != nothing
         backend()
@@ -37,14 +68,17 @@ function plotmodel( m::Model
     for t in range(m.t_min, m.t_max, length=frames)
         plt =
             if SoR == :bodyframe
-                plotbody(m.bodyframe(t), title="Body Frame")
+                plot_process(m.bodyframe(t), bodylines;
+                             title = "Body Frame")
             elseif SoR == :inertialframe
-                plotbody(m.inertialframe(t), title="Inertial Frame")
+                plot_process(m.inertialframe(t), bodylines;
+                             title = "Inertial Frame")
             elseif SoR == :both
-                l = @Plots.layout [a b]
-                plt1 = plotbody(m.bodyframe(t), title="Body Frame")
-                plt2 = plotbody(m.inertialframe(t), title="Inertial Frame")
-                Plots.plot(plt1, plt2, layout=l)
+                plt_bd = plot_process(m.bodyframe(t), bodylines;
+                                      title = "Body Frame")
+                plt_it = plot_process(m.inertialframe(t), bodylines;
+                                      title = "Inertial Frame")
+                Plots.plot(plt_bd, plt_it, layout=(1,2))
             else
                 error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :original, :inertial, :both.")
                 return
@@ -53,21 +87,24 @@ function plotmodel( m::Model
         Plots.frame(anime, plt)
     end
 
-    if saveas isa String
-        local extension = match(r"\.[0-9a-z]+$", saveas)
-        if extension != nothing
-            extension = extension.match
-        end
-        if extension == ".gif"
-            Plots.gif(anime, saveas, fps = fps)
-        elseif extension == ".mp4"
-            Plots.mp4(anime, saveas, fps = fps)
-        elseif extension == ".mov"
-            Plots.mov(anime, saveas, fps = fps)
-        else
-            Plots.gif(anime, saveas * ".gif", fps = fps)
-        end
-    end
-
+    println("Fps: ", fps)
+    saveas isa String && saveanimation(anime, saveas, fps=fps)
     return anime
+end
+
+function saveanimation(anime, saveas::String; fps::Int=30)
+    print(fps)
+    local extension = match(r"\.[0-9a-z]+$", saveas)
+    if extension != nothing
+        extension = extension.match
+    end
+    if extension == ".gif"
+        Plots.gif(anime, saveas, fps = fps)
+    elseif extension == ".mp4"
+        Plots.mp4(anime, saveas, fps = fps)
+    elseif extension == ".mov"
+        Plots.mov(anime, saveas, fps = fps)
+    else
+        Plots.gif(anime, saveas * ".gif", fps = fps)
+    end
 end

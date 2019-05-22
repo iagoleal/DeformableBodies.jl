@@ -4,7 +4,6 @@
 using DeformableBodies
 
 # Initial values for the body
-# CM fixed at origin
 const r_0 = centralize(
     [ PointMass(3.,  [0.,   0.,   0.])   # centro do corpo
     , PointMass(2.,  [0.,  -1.,   0.])   # parte de trás
@@ -49,15 +48,33 @@ for i in 2:9
     push!(bodies, ri)
 end
 
+# Create a model
 model = Model( bodies
              , 0.
              , 10.
              , one(Quaternion)
              , zeros(3)
              )
-
+# And solve it
 rotbodies, R, L = solve!(model)
+
+# Lines to connect different parts of the body
+# (Only important for plotting)
+bodylines = [(1, 2),
+             (2, 3),
+             (2, 4),
+             (2, 5),
+             (1, 6),
+             (6, 7),
+             (6, 8),
+             (6, 9)]
 
 println("Trajectories are stored on the following variables:")
 println("Cat's internal frame: model.bodyframe")
 println("Inertial frame      : model.inertialframe")
+
+# Save the image as a gif
+anim = plotmodel(model, :both,
+                 bodylines=bodylines,
+                 duration=tmax,
+                 saveas="gato.gif")

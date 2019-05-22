@@ -34,15 +34,30 @@ for x in r_0[end-1:end]
     push!(bodies, let x=x; t -> rotate(x, axis=e_1, angle=ω*t); end)
 end
 
+# Create the model
 model = Model( bodies
              , 0.
              , 7.
              , one(Quaternion)
              , zeros(3)
              )
-
+# And solve it
 _, rotations, momentum = solve!(model)
+
+# Lines to connect different parts of the body
+# (Only important for plotting)
+bodylines = Tuple[]
+for i = 1:length(r_0), j = i:length(r_0)
+    if count(a -> first(a) == last(a), zip(r_0[i].pos,r_0[j].pos)) == 2
+        push!(bodylines, (i,j))
+    end
+end
 
 println("Trajectories are stored on the following variables:")
 println("Body's internal frame: model.bodyframe")
 println("Inertial frame       : model.inertialframe")
+
+# Plotting time!
+#= anim = plotmodel(model, :both, =#
+#=                  bodylines=bodylines, =#
+#=                  duration=tmax) =#
