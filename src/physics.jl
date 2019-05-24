@@ -30,11 +30,19 @@ PointMass(m::T, x::Vector{T}) where {T <: Real} = PointMass{T}(m,x)
     ]
 @inline a × b = cross(a,b)
 
+# Velocity of a set of trajectories
+function velocity(xs, t; ε=1e-6)
+    return map((a,b) -> (a.pos - b.pos) / (2*ε), xs(t+ε), xs(t-ε))
+end
+
 """
     center_of_mass(xs)
 
 Gets a system of [`PointMass`](@ref)es and returns their
-center of mass.
+center of mass via
+```math
+cm(x) = \\frac{1}{\\sum m_i}\\sum m_i x_i.
+```
 """
 function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
     cm = zeros(3)
@@ -46,6 +54,15 @@ function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
     return cm / total_mass
 end
 
+"""
+    inertia_tensor(xs)
+
+Gets a system of [`PointMass`](@ref)es and returns their
+inertia tensor via
+```math
+I = \\sum m_i \\langle x_i, x_i \\rangle \\text{id} - x_i \\otimes x_i.
+```
+"""
 function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real
     id = one(Array{T}(undef, 3, 3))
 
@@ -68,21 +85,41 @@ end
     #= return I =#
 #= end =#
 
+"""
+    angular_momentum(xs, vs)
+
+Receives a system of [`PointMass`](@ref)es and their velocities, and returns their
+angular momentum vector via
+```math
+L = \\sum m_i x_i \times v_i.
+```
+"""
 @inline angular_momentum(xs::AbstractArray{PointMass{T},1}, vs::AbstractArray) where T<:Real =
     sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs) )
 
+"""
+    centralize(xs)
+
+Receives a system of [`PointMass`](@ref)es and returns
+the same system translated such that their center of mass
+is fixed on the origin.
+"""
 function centralize(xs::AbstractArray{PointMass{T},1}) where T<: Real
     cm = center_of_mass(xs)
     return map(r -> PointMass(r.mass, r.pos - cm), xs)
 end
 
-# Velocity of a set of trajectories
-function velocity(xs, t; ε=1e-6)
-    return map((a,b) -> (a.pos - b.pos) / (2*ε), xs(t+ε), xs(t-ε))
+function centralize!(xs::AbstractArray{PointMass{T},1}) where T<: Real
+    cm = center_of_mass(xs)
+    for i in 1:length(xs)
+        xs[i] -= cm
+    end
+    return xs
 end
 
 # Extend Quaternion.rotate to deal with point masses
 using .Quaternions: rotate
 
-@inline Quaternions.rotate(x::PointMass; angle=0, axis=[0,0,0]) =
-        PointMass(x.mass, rotate(x.pos, angle=angle, axis=axis))
+@inline function Quaternions.rotate(x::PointMass; angle=0, axis=[0,0,0])
+    return PointMass(x.mass, rotate(x.pos, angle=angle, axis=axis))
+end

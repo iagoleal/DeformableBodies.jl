@@ -17,6 +17,7 @@ include("physics.jl")
 
 export PointMass
 export centralize,
+       centralize!,
        center_of_mass,
        inertia_tensor,
        angular_momentum

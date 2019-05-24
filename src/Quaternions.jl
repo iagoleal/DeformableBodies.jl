@@ -99,6 +99,25 @@ julia> imagq(a)
 
 @inline Base.angle(q::Quaternion) = 2 * atan(_vecnorm(q), real(q))
 
+
+"""
+    axis(q)
+
+Returns the unit vector on the direction
+of the imaginary part of a [`Quaternion`](@ref).
+
+# Examples
+```jldoctest
+julia> Quaternion(10,1,1,0.5)
+10.0 + 1.0i + 1.0j + 0.5k
+
+julia> axis(Quaternion(10,1,1,0.5))
+3-element Array{Float64,1}:
+ 0.6666666666666666
+ 0.6666666666666666
+ 0.3333333333333333
+```
+"""
 function axis(q::Quaternion)
     v = imag(q)
     return v / _vecnorm(v)
@@ -263,7 +282,7 @@ Receives an axis `v` and angle `θ`
 and returns the [`Quaternion`](@ref)
 who corresponds to a rotation of `θ` around `v`.
 """
-function axis2quaternion(ax::AbstractVector,angle::Real)
+function axis2quaternion(ax,angle::Real)
     if length(ax) != 3
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
@@ -278,14 +297,14 @@ Rotate a vector `v` by a quaternion `q`.
 The quaternion may be given directly
 or as an axis and an angle.
 """
-function rotate(q::Quaternion, v::AbstractVector)
+function rotate(q::Quaternion, v)
     if length(v) != 3
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
     q = normalize(q)
     imag( q * Quaternion(0, v) * conj(q) )
 end
-@inline function rotate( v::AbstractVector
+@inline function rotate( v
                        ; angle=0
                        , axis=[0, 0, 1]
                        )

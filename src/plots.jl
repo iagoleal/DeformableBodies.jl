@@ -87,7 +87,6 @@ function plotmodel( m::Model
         Plots.frame(anime, plt)
     end
 
-    println("Fps: ", fps)
     saveas isa String && saveanimation(anime, saveas, fps=fps)
     return anime
 end

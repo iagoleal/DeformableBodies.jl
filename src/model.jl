@@ -1,7 +1,12 @@
 import OrdinaryDiffEq
 const ODE = OrdinaryDiffEq
 
-# Struct to store the problem data before solving
+"""
+    Model
+
+Stores the data of a deformable body problem
+before and after solving.
+"""
 mutable struct Model
     bodyframe    ::Function            # Trajectories on body frame
     t_min        ::Float64             # Initial time
@@ -12,22 +17,18 @@ mutable struct Model
     Model(trjs, t0, tf, q_0, p_0) = new(trjs, t0, tf, q_0, p_0)
 end
 
-#= function Model(trajectories::Function, t_min, t_max, q_0, p_0) =#
-#=     trajs = [t -> trajectories(t)[i] for i in 1:length(trajectories(t_min)) ] =#
-#=     Model(trajs, t_min, t_max, q_0, p_0) =#
-#= end =#
 function Model(trajectories::Array{Function,1}, t_min, t_max, q_0, p_0)
     trajs = t -> [xi(t) for xi in trajectories]
     return Model(trajs, t_min, t_max, q_0, p_0)
 end
 
-function eq_of_motion!(du,u,bodies,t)
+function eq_of_motion!(du,u,trajectories,t)
     q = Quaternion(u[1:4])
     p = u[5:end]
     # Change particles to SoR with CM at origin
-    r = bodies(t) |> centralize
+    r = trajectories(t) |> centralize
     # Velocities must be calculated using a fixed SoR, so we don't centralize here
-    v = velocity(bodies, t)
+    v = velocity(trajectories, t)
     Iinv = (inv ∘ inertia_tensor)(r)
     L = angular_momentum(r, v)
     ω = Iinv * (p - L)
@@ -47,6 +48,13 @@ end
                   , m.bodyframe
                   )
 
+"""
+    solve!(m::Model; reltol, abstol, solver)
+
+Receives a [`Model`](@ref), calculates the
+trajectory of the body on a inertial frame
+and stores it in the variable `m.inertialframe`.
+"""
 function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     prob = construct_problem(m)
     solution = ODE.solve(prob
