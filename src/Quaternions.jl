@@ -120,7 +120,7 @@ julia> axis(Quaternion(10,1,1,0.5))
 """
 function axis(q::Quaternion)
     v = imag(q)
-    return v / _vecnorm(v)
+    return v / _vecnorm(q)
 end
 
 # Quaternions form an involution algebra.
