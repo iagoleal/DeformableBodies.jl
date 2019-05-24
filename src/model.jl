@@ -70,3 +70,18 @@ function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     m.inertialframe = t -> [PointMass(x.mass, rotate(R(t), x.pos)) for x in m.bodyframe(t)]
     return m.inertialframe, R, momentum
 end
+
+# Printing Models
+using Base: show
+
+function Base.show(io::IO, m::Model)
+    print(io, "Model(",m.t_min,", ",m.t_max,", ",m.q_0,", ",m.p_0,")")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", m::Model)
+    println(io, "Deformable Body Model")
+    println(io, "Initial Time: ", m.t_min)
+    println(io, "Final Time  : ", m.t_max)
+    println(io, "Initial Data are\n    Rotation: ", m.q_0, "\n    Angular Momentum: ", m.p_0)
+    print(io, "Number of points: ", length(m.bodyframe(m.t_min)))
+end
