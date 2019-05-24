@@ -3,9 +3,8 @@ import Plots
 # Plot a single body
 function plotbody!(plt, body)
     local pos = hcat((x.pos for x in body)...)
-    x,y,z = pos[1,:], pos[2,:], pos[3,:]
-    Plots.plot!(plt, x, y, z,
-                seriestype=:scatter
+    Plots.plot!(plt, pos[1,:], pos[2,:], pos[3,:],
+                seriestype=:scatter,
                )
     return plt
 end
@@ -28,12 +27,12 @@ end
 # Entire process for each single plot
 @inline function plot_process(data, bodylines; title="")
     plt = Plots.plot3d(title=title)
-    plotbody!(plt, data)
     if bodylines != nothing
         plotbodylines!(plt, data, bodylines,
                        linecolor=:black
                       )
     end
+    plotbody!(plt, data)
     return plt
 end
 
@@ -51,9 +50,9 @@ The aditional arguments currently available are
 - `bodylines`: Array of points pairs. Storages the data about what points should be linked.
 """
 function plotmodel( m::Model
-                    , SoR=:bodyframe # System of Reference
-                    ; fps=15
-                    , duration=5.0
+                    , SoR=:both # System of Reference
+                    ; fps=24
+                    , duration=m.t_max
                     , saveas=nothing
                     , backend=nothing
                     , bodylines=nothing
@@ -77,8 +76,10 @@ function plotmodel( m::Model
                 plt_bd = plot_process(m.bodyframe(t), bodylines;
                                       title = "Body Frame")
                 plt_it = plot_process(m.inertialframe(t), bodylines;
-                                      title = "Inertial Frame")
-                Plots.plot(plt_bd, plt_it, layout=(1,2))
+                Plots.plot(plt_bd, plt_it,
+                           layout=(1,2),
+                           link=:all
+                          )
             else
                 error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :original, :inertial, :both.")
                 return
