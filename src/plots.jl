@@ -76,6 +76,7 @@ function plotmodel( m::Model
                 plt_bd = plot_process(m.bodyframe(t), bodylines;
                                       title = "Body Frame")
                 plt_it = plot_process(m.inertialframe(t), bodylines;
+                                      title = "Inertial Frame")
                 Plots.plot(plt_bd, plt_it,
                            layout=(1,2),
                            link=:all
