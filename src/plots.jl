@@ -1,39 +1,32 @@
 using Plots
 
-# Plot a single body
-function plotbody!(plt, body)
-    local pos = hcat((x.pos for x in body)...)
-    Plots.plot!(plt, pos[1,:], pos[2,:], pos[3,:],
-                seriestype=:scatter,
-               )
-    return plt
-end
+# This macro allows us to directly plot any array of PointMasses
+@Plots.recipe function f(body::Vector{PointMass{T}}; bodylines = nothing) where T
+    grid         --> true
+    linecolor    --> :black
+    legend       :=  :none
 
-# Plot lines connecting different point masses
-function plotbodylines!(plt, body, lines; linecolor=:black)
-    for l in lines
-        # No point in drawing a line with length zero...
-        l[1] == l[2] && continue
-        x  = [body[l[1]].pos body[l[2]].pos]
-        Plots.plot!(plt, x[1,:], x[2,:], x[3,:],
-                    seriestype=:path3d,
-                    linecolor=linecolor,
-                    leg=nothing
-                   )
-    end
-    return plt
-end
-
-# Entire process for each single plot
-@inline function plot_process(data, bodylines; title="")
-    plt = Plots.plot3d(title=title)
+    # Plot each line connecting the Point Massses _before_ the masses themselves
     if bodylines != nothing
-        plotbodylines!(plt, data, bodylines,
-                       linecolor=:black
-                      )
+        seriestype := :path
+        for l in bodylines
+            # No point in drawing a line with length zero...
+            l[1] == l[2] && continue
+            local x = hcat(body[l[1]].pos, body[l[2]].pos)
+            @Plots.series begin
+                (x[1,:], x[2,:], x[3,:])
+            end
+        end
     end
-    plotbody!(plt, data)
-    return plt
+    delete!(plotattributes, :bodylines)
+
+    # Plot body
+    seriestype := :scatter
+
+    local x = hcat(pos.(body)...)
+    @Plots.series begin
+        (x[1,:], x[2,:], x[3,:])
+    end
 end
 
 """
@@ -89,16 +82,36 @@ function plotmodel( m::Model
     for t in range(m.t_min, m.t_max, length=frames)
         plt =
             if SoR == :bodyframe
-                plot_process(m.bodyframe(t), bodylines;
-                             title = "Body Frame")
+                Plots.plot(m.bodyframe(t),
+                           bodylines = bodylines,
+                           xlim  = (lim_min[1], lim_max[1]),
+                           ylim  = (lim_min[2], lim_max[2]),
+                           zlim  = (lim_min[3], lim_max[3]),
+                           title = "Body Frame"
+                          )
             elseif SoR == :inertialframe
-                plot_process(m.inertialframe(t), bodylines;
-                             title = "Inertial Frame")
+                Plots.plot(m.inertialframe(t),
+                           bodylines = bodylines,
+                           xlim  = (lim_min[1], lim_max[1]),
+                           ylim  = (lim_min[2], lim_max[2]),
+                           zlim  = (lim_min[3], lim_max[3]),
+                           title = "Inertial Frame"
+                          )
             elseif SoR == :both
-                plt_bd = plot_process(m.bodyframe(t), bodylines;
-                                      title = "Body Frame")
-                plt_it = plot_process(m.inertialframe(t), bodylines;
-                                      title = "Inertial Frame")
+                plt_bd = Plots.plot(m.bodyframe(t),
+                                    bodylines = bodylines,
+                                    xlim  = (lim_min[1], lim_max[1]),
+                                    ylim  = (lim_min[2], lim_max[2]),
+                                    zlim  = (lim_min[3], lim_max[3]),
+                                    title = "Body Frame"
+                                   )
+                plt_it = Plots.plot(m.inertialframe(t),
+                                    bodylines = bodylines,
+                                    xlim  = (lim_min[1], lim_max[1]),
+                                    ylim  = (lim_min[2], lim_max[2]),
+                                    zlim  = (lim_min[3], lim_max[3]),
+                                    title = "Inertial Frame"
+                                   )
                 Plots.plot(plt_bd, plt_it,
                            layout=(1,2),
                            link=:all
