@@ -74,6 +74,7 @@ println("Cat's internal frame: model.bodyframe")
 println("Inertial frame      : model.inertialframe")
 
 # Save the image as a gif
+println("\nPlotting result to \"gato.gif\"")
 anim = plotmodel(model, :both,
                  bodylines=bodylines,
                  duration=tmax,
