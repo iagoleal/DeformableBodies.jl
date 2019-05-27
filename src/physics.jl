@@ -5,22 +5,18 @@
 Wrapper around a mass
 and a position on ``R^3``.
 """
-struct PointMass{T} <:Any where T <: Real
+struct PointMass{T} <: Any where {T<:Real}
     mass::T
     pos::Vector{T}
-    function PointMass{T}(m::T, x::Vector) where T <: Real
-        if m <= 0
-            error("Error: negative mass given.")
-        end
-        if length(x) != 3
-            error("Error: PointMass must three dimensional.")
-        end
+    function PointMass{T}(m, x) where {T<:Real}
+        m > 0 || error("Error: negative mass given.")
+        length(x) == 3 || error("Error: PointMass must three dimensional.")
         new(m, x)
     end
 end
 
 # Alternative constructors
-PointMass(m::T, x::Vector{T}) where {T <: Real} = PointMass{T}(m,x)
+PointMass(m::Real, x::Vector{S}) where {S<:Real} = PointMass{typeof(promote(m,x[1])[1])}(m,x)
 
 """
     pos(p::PointMass)
