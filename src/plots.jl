@@ -67,6 +67,23 @@ function plotmodel( m::Model
 
     local frames = convert(Int, ceil(fps*duration))
 
+    # Get maximum of coordinates on all iterations
+    lim_max = [-Inf, -Inf, -Inf]
+    lim_min = [Inf, Inf, Inf]
+    for t in range(m.t_min, m.t_max, length=frames)
+        if SoR == :bodyframe
+            x = m.bodyframe(t)
+        elseif SoR == :inertialframe
+            x = m.inertialframe(t)
+        elseif SoR == :both
+            x = vcat(m.bodyframe(t), m.inertialframe(t))
+        end
+        max_t = maximum(hcat(pos.(x)...), dims=2)
+        min_t = minimum(hcat(pos.(x)...), dims=2)
+        lim_max = max.(lim_max, max_t)
+        lim_min = min.(lim_min, min_t)
+    end
+
     # Build the animation
     anime = Plots.Animation()
     for t in range(m.t_min, m.t_max, length=frames)
