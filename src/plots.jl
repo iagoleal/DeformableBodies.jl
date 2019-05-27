@@ -1,4 +1,4 @@
-import Plots
+using Plots
 
 # Plot a single body
 function plotbody!(plt, body)
@@ -44,22 +44,27 @@ The argument `SoR` means "system of reference" and accepts one of the following 
 
 The aditional arguments currently available are
 - `fps`: frames per second.
-- `duration`: duration of animation in seconds.
+- `duration`: length of animation in seconds.
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
 - `backend`: Which Plots.jl backend to use.
-- `bodylines`: Array of points pairs. Storages the data about what points should be linked.
+- `bodylines`: Array of points pairs. Stores the data who says which points should be linked.
 """
 function plotmodel( m::Model
-                    , SoR=:both # System of Reference
-                    ; fps=24
-                    , duration=m.t_max
-                    , saveas=nothing
-                    , backend=nothing
-                    , bodylines=nothing
-                    )
+                  , SoR=:both # System of Reference
+                  ; fps=24
+                  , duration=m.t_max
+                  , saveas=nothing
+                  , backend=nothing
+                  , bodylines=nothing
+                  )
     if backend != nothing
         backend()
     end
+    if !(SoR in [:inertialframe, :bodyframe, :both])
+        error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :original, :inertial, :both.")
+        return
+    end
+
     local frames = convert(Int, ceil(fps*duration))
 
     # Build the animation
@@ -81,9 +86,6 @@ function plotmodel( m::Model
                            layout=(1,2),
                            link=:all
                           )
-            else
-                error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :original, :inertial, :both.")
-                return
             end
         # Push plot into animation
         Plots.frame(anime, plt)
