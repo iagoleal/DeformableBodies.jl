@@ -22,6 +22,19 @@ end
 # Alternative constructors
 PointMass(m::T, x::Vector{T}) where {T <: Real} = PointMass{T}(m,x)
 
+"""
+    pos(p::PointMass)
+
+Returns position of a [`PointMass`](@ref).
+"""
+pos(p::PointMass)  = p.pos
+"""
+    mass(p::PointMass)
+
+Returns mass of a [`PointMass`](@ref).
+"""
+mass(p::PointMass) = p.mass
+
 # Cross Product of 3-dimensional vectors
 @inline cross(a,b) =
     [ a[2]*b[3] - a[3]*b[2]

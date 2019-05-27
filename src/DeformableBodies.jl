@@ -16,7 +16,9 @@ export imagq,
 include("physics.jl")
 
 export PointMass
-export centralize,
+export pos,
+       mass,
+       centralize,
        centralize!,
        center_of_mass,
        inertia_tensor,
