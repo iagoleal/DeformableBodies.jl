@@ -37,10 +37,18 @@ The argument `SoR` means "system of reference" and accepts one of the following 
 
 The aditional arguments currently available are
 - `fps`: frames per second.
-- `duration`: length of animation in seconds.
+- `duration`: length of animation in seconds. Default is `model.t_max`.
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
 - `backend`: Which Plots.jl backend to use.
 - `bodylines`: Array of points pairs. Stores the data who says which points should be linked.
+
+Additionally, any keyword argument supported by [`Plots.plot`](@ref)
+is accepted and will be repassed to the plot.
+
+# Examples
+```jldoctest
+julia> plotmodel(m, :both, fps=15, saveas="example.gif", color=:green,viewangle=(30,60))
+```
 """
 function plotmodel( m::Model
                   , SoR=:both # System of Reference
@@ -49,12 +57,13 @@ function plotmodel( m::Model
                   , saveas=nothing
                   , backend=nothing
                   , bodylines=nothing
+                  , args... # Additional keyword arguments to be passed to Plots.plot
                   )
     if backend != nothing
         backend()
     end
     if !(SoR in [:inertialframe, :bodyframe, :both])
-        error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :original, :inertial, :both.")
+        error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :bodyframe, :inertialframe, :both.")
         return
     end
 
@@ -87,7 +96,8 @@ function plotmodel( m::Model
                            xlim  = (lim_min[1], lim_max[1]),
                            ylim  = (lim_min[2], lim_max[2]),
                            zlim  = (lim_min[3], lim_max[3]),
-                           title = "Body Frame"
+                           title = "Body Frame";
+                           args...
                           )
             elseif SoR == :inertialframe
                 Plots.plot(m.inertialframe(t),
@@ -95,7 +105,8 @@ function plotmodel( m::Model
                            xlim  = (lim_min[1], lim_max[1]),
                            ylim  = (lim_min[2], lim_max[2]),
                            zlim  = (lim_min[3], lim_max[3]),
-                           title = "Inertial Frame"
+                           title = "Inertial Frame";
+                           args...
                           )
             elseif SoR == :both
                 plt_bd = Plots.plot(m.bodyframe(t),
@@ -103,14 +114,16 @@ function plotmodel( m::Model
                                     xlim  = (lim_min[1], lim_max[1]),
                                     ylim  = (lim_min[2], lim_max[2]),
                                     zlim  = (lim_min[3], lim_max[3]),
-                                    title = "Body Frame"
+                                    title = "Body Frame";
+                                    args...
                                    )
                 plt_it = Plots.plot(m.inertialframe(t),
                                     bodylines = bodylines,
                                     xlim  = (lim_min[1], lim_max[1]),
                                     ylim  = (lim_min[2], lim_max[2]),
                                     zlim  = (lim_min[3], lim_max[3]),
-                                    title = "Inertial Frame"
+                                    title = "Inertial Frame";
+                                    args...
                                    )
                 Plots.plot(plt_bd, plt_it,
                            layout=(1,2),
