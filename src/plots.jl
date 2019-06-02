@@ -1,10 +1,13 @@
 using Plots
 
 # This macro allows us to directly plot any array of PointMasses
-@Plots.recipe function f(body::Vector{PointMass{T}}; bodylines = nothing) where T
-    grid         --> true
-    linecolor    --> :black
-    legend       :=  :none
+@Plots.recipe function f(body::Vector{PointMass{T}}; bodylines = nothing, markersize_is_mass=true) where T
+    grid       --> true
+    linecolor  --> :black
+    legend     :=  :none
+    # Each scatter size depends on the mass of the point
+    markersize --> (markersize_is_mass ? mass.(body) : 4.0)
+    delete!(plotattributes, :markersize_is_mass)
 
     # Plot each line connecting the Point Massses _before_ the masses themselves
     if bodylines != nothing
@@ -41,6 +44,7 @@ The aditional arguments currently available are
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
 - `backend`: Which Plots.jl backend to use.
 - `bodylines`: Array of points pairs. Stores the data who says which points should be linked.
+- `markersize_is_mass`: Says if attribute `markersize` should be weighted by the mass of each particle. Default is `true`.
 
 Additionally, any keyword argument supported by [`Plots.plot`](@ref)
 is accepted and will be repassed to the plot.
