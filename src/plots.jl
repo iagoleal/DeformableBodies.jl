@@ -7,7 +7,7 @@ import Plots: RecipesBase
     linecolor  --> :black
     legend     :=  :none
     # Each scatter size depends on the mass of the point
-    markersize --> (markersize_is_mass ? mass.(body) : 4.0)
+    markersize --> (markersize_is_mass ? 4.0*mass.(body) : 4.0)
     delete!(plotattributes, :markersize_is_mass)
 
     # Plot each line connecting the Point Massses _before_ the masses themselves
