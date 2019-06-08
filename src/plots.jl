@@ -1,4 +1,5 @@
-using Plots
+import Plots
+import Plots: RecipesBase
 
 # This macro allows us to directly plot any array of PointMasses
 @Plots.recipe function f(body::Vector{PointMass{T}}; bodylines = nothing, markersize_is_mass=true) where T
@@ -42,7 +43,6 @@ The aditional arguments currently available are
 - `fps`: frames per second.
 - `duration`: length of animation in seconds. Default is `model.t_max`.
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
-- `backend`: Which Plots.jl backend to use.
 - `bodylines`: Array of points pairs. Stores the data who says which points should be linked.
 - `markersize_is_mass`: Says if attribute `markersize` should be weighted by the mass of each particle. Default is `true`.
 
@@ -59,13 +59,9 @@ function plotmodel( m::Model
                   ; fps=24
                   , duration=m.t_max
                   , saveas=nothing
-                  , backend=nothing
                   , bodylines=nothing
                   , args... # Additional keyword arguments to be passed to Plots.plot
                   )
-    if backend != nothing
-        backend()
-    end
     if !(SoR in [:inertialframe, :bodyframe, :both])
         error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :bodyframe, :inertialframe, :both.")
         return nothing
