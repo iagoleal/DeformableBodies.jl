@@ -57,7 +57,12 @@ println("Trajectories are stored on the following variables:")
 println("Body's internal frame: model.bodyframe")
 println("Inertial frame       : model.inertialframe")
 
+import Plots: pyplot
+pyplot()
 # Plotting time!
-#= anim = plotmodel(model, :both, =#
-#=                  bodylines=bodylines, =#
-#=                  duration=tmax) =#
+anim = plotmodel( model, :both
+                , bodylines=bodylines
+                , duration=tmax
+                , markercolor=:purple
+                , saveas="cubecopter.gif"
+                )
