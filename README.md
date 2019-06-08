@@ -8,11 +8,15 @@ import Pkg
 Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
 ```
 
-
 ## Usage
 
 The folder `examples/`
 contains some examples of how to construct a model.
+
+The result of a simulation is summarized on the following figure,
+made with the example file `examples/cubecopter.jl`:
+
+![Cube with spinning helix](figs/cubecopter.gif)
 
 ## Mathematics behind the program
 _Geometry goes here._
