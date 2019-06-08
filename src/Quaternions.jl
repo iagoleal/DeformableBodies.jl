@@ -10,7 +10,7 @@ export imagq,
        axis,
        normalize,
        normalize!,
-       axis2quaternion,
+       axistoquaternion,
        rotate
 
 # We define quaternions to be a set of 4 real numbers.
@@ -271,13 +271,13 @@ end
 # it gives us an rotation matrix R(v,θ) which
 # may be represented according to
 """
-    axis2quaternion(axis, angle)
+    axistoquaternion(axis, angle)
 
 Receives an axis `v` and angle `θ`
 and returns the [`Quaternion`](@ref)
 who corresponds to a rotation of `θ` around `v`.
 """
-function axis2quaternion(ax,angle::Real)
+function axistoquaternion(ax, angle::Real)
     if length(ax) != 3
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
@@ -303,7 +303,7 @@ end
                        ; angle=0
                        , axis=[0, 0, 1]
                        )
-    return rotate(axis2quaternion(axis, angle), v)
+    return rotate(axistoquaternion(axis, angle), v)
 end
 
 end

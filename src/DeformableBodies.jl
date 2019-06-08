@@ -9,7 +9,7 @@ export imagq,
        axis,
        normalize,
        normalize!,
-       axis2quaternion,
+       axistoquaternion,
        rotate
 
 # Physical utilities

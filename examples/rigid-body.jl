@@ -20,7 +20,7 @@ const r_0 = [PointMass(rand()*10, unif_sphere(3)) for i in 1:npts]
 model = Model( t -> r_0 # Constant trajectories
              , 0.
              , 5.
-             , axis2quaternion(unif_sphere(3), rand()*2π) # Random initial rotation
+             , axistoquaternion(unif_sphere(3), rand()*2π) # Random initial rotation
              , randn(3) + 3 # Random normally distributed (~N(3,1)) angular momentum
              )
 # And solve it
