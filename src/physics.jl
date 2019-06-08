@@ -11,12 +11,12 @@ struct PointMass{T} <: Any where {T<:Real}
     function PointMass{T}(m, x) where {T<:Real}
         m > 0 || error("Error: negative mass given.")
         length(x) == 3 || error("Error: PointMass must three dimensional.")
-        new(m, x)
+        return new(m, x)
     end
 end
 
 # Alternative constructors
-PointMass(m::Real, x::Vector{S}) where {S<:Real} = PointMass{typeof(promote(m,x[1])[1])}(m,x)
+PointMass(m::Real, x::Vector{<:Real}) = PointMass{typeof(promote(m,x[1])[1])}(m,x)
 
 """
     pos(p::PointMass)
@@ -24,6 +24,7 @@ PointMass(m::Real, x::Vector{S}) where {S<:Real} = PointMass{typeof(promote(m,x[
 Returns position of a [`PointMass`](@ref).
 """
 pos(p::PointMass)  = p.pos
+
 """
     mass(p::PointMass)
 
@@ -40,9 +41,7 @@ mass(p::PointMass) = p.mass
 @inline a × b = cross(a,b)
 
 # Velocity of a set of trajectories
-function velocity(xs, t; ε=1e-6)
-    return map((a,b) -> (a.pos - b.pos) / (2*ε), xs(t+ε), xs(t-ε))
-end
+velocity(xs, t; ε=1e-6) = map((a,b) -> (a.pos - b.pos)/(2*ε), xs(t+ε), xs(t-ε))
 
 """
     center_of_mass(xs)
@@ -53,9 +52,9 @@ center of mass via
 cm(x) = \\frac{1}{\\sum m_i}\\sum m_i x_i.
 ```
 """
-function center_of_mass(xs::AbstractArray{PointMass{T}, 1}) where T <: Real
+function center_of_mass(xs::AbstractVector{PointMass{T}}) where {T<:Real}
     cm = zeros(3)
-    total_mass = 0.
+    total_mass = 0.0
     for x in xs
         total_mass += x.mass
         cm += x.mass * x.pos
@@ -72,9 +71,8 @@ inertia tensor via
 I = \\sum m_i \\langle x_i, x_i \\rangle \\text{id} - x_i \\otimes x_i.
 ```
 """
-function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real
+function inertia_tensor(xs::AbstractVector{PointMass{T}}) where {T<:Real}
     id = one(Array{T}(undef, 3, 3))
-
     return sum(x.mass * (x.pos'x.pos * id - kron(x.pos',x.pos)) for x in xs)
 end
 #= function inertia_tensor(xs::AbstractArray{PointMass{T},1}) where T <: Real =#
@@ -103,8 +101,9 @@ angular momentum vector via
 L = \\sum m_i x_i \times v_i.
 ```
 """
-@inline angular_momentum(xs::AbstractArray{PointMass{T},1}, vs::AbstractArray) where T<:Real =
-    sum( x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs) )
+@inline function angular_momentum(xs, vs)
+    return sum(x.mass * (cross(x.pos, v)) for (x,v) in zip(xs,vs))
+end
 
 """
     centralize(xs)
@@ -113,12 +112,12 @@ Receives a system of [`PointMass`](@ref)es and returns
 the same system translated such that their center of mass
 is fixed on the origin.
 """
-function centralize(xs::AbstractArray{PointMass{T},1}) where T<: Real
+function centralize(xs::AbstractVector{PointMass{T}}) where {T<:Real}
     cm = center_of_mass(xs)
     return map(r -> PointMass(r.mass, r.pos - cm), xs)
 end
 
-function centralize!(xs::AbstractArray{PointMass{T},1}) where T<: Real
+function centralize!(xs::AbstractVector{PointMass{T}}) where {T<:Real}
     cm = center_of_mass(xs)
     for i in 1:length(xs)
         xs[i] -= cm
@@ -130,5 +129,5 @@ end
 using .Quaternions: rotate
 
 @inline function Quaternions.rotate(x::PointMass; angle=0, axis=[0,0,0])
-    return PointMass(x.mass, rotate(x.pos, angle=angle, axis=axis))
+    return PointMass(x.mass, rotate(x.pos; angle=angle, axis=axis))
 end

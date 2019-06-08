@@ -1,6 +1,6 @@
 module DeformableBodies
 
-# Definition of Quaternions
+# Quaternions definitions
 include("Quaternions.jl")
 using .Quaternions
 

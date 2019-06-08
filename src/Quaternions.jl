@@ -25,32 +25,31 @@ struct Quaternion{T} <:Number where T <: Real
     q::Array{T, 1}
     function Quaternion{T}(x::AbstractVector) where T <: Real
         if length(x) == 4
-            new(x)
+            return new(x)
         elseif length(x) == 3
-            new([zero(T); x])
+            return new([zero(T); x])
         else
             error("Quaternions are four-dimensional!\nDimension given: $(length(x))")
         end
     end
 end
 
-Quaternion{T}(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) where {T <: Real} =
+Quaternion{T}(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) where {T<:Real} =
     Quaternion{T}([t,x,y,z])
 
-Quaternion(x::AbstractVector{T}) where {T <: Real} = Quaternion{T}(x)
+Quaternion(x::AbstractVector{T}) where {T<:Real} = Quaternion{T}(x)
 Quaternion(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) = Quaternion([t,x,y,z])
 Quaternion(t::Real, v::AbstractVector{<:Real}) = Quaternion([t; v])
 
-Quaternion{T}(q::Quaternion) where T <: Real = Quaternion{T}(q.q)
+Quaternion{T}(q::Quaternion) where {T<:Real} = Quaternion{T}(q.q)
 Quaternion(q::Quaternion) = q
 
 Quaternion{T}(z::Complex{T}) where T = Quaternion{T}(real(z), imag(z))
 Quaternion(z::Complex) = Quaternion(real(z), imag(z))
 
-
-Base.promote_rule(::Type{Quaternion{T}}, ::Type{S}) where {T<:Real,S<:Real} =
+Base.promote_rule(::Type{Quaternion{T}}, ::Type{S}) where {T,S<:Real} =
     Quaternion{promote_type(T,S)}
-Base.promote_rule(::Type{Quaternion{T}}, ::Type{Quaternion{S}}) where {T<:Real,S<:Real} =
+Base.promote_rule(::Type{Quaternion{T}}, ::Type{Quaternion{S}}) where {T,S<:Real} =
     Quaternion{promote_type(T,S)}
 
 Base.widen(::Type{Quaternion{T}}) where {T} = Quaternion{widen(T)}
@@ -85,17 +84,17 @@ julia> imagq(a)
 0 + 2i + 3j + 4k
 ```
 """
-@inline imagq(q::Quaternion) = Quaternion(q.q[2:end])
+@inline imagq(q::Quaternion) = Quaternion(0, q.q[2:end])
 
 # Or a radius / angle decomposition
 
 # Geometricaly, abs(q) represents the length of a quaternion
 # when it is viewed as a vector in R^4
-@inline Base.abs2(q::Quaternion) = sum( x ^ 2 for x in q.q)
+@inline Base.abs2(q::Quaternion) = sum(x ^ 2 for x in q.q)
 @inline Base.abs(q::Quaternion)  = (sqrt ∘ abs2)(q)
 
 # Abs of imaginary part of q
-@inline _vecnorm(q::Quaternion) = (sqrt ∘ sum)( x ^ 2 for x in imag(q))
+@inline _vecnorm(q::Quaternion) = (sqrt ∘ sum)(x ^ 2 for x in imag(q))
 
 @inline Base.angle(q::Quaternion) = 2 * atan(_vecnorm(q), real(q))
 
@@ -118,14 +117,11 @@ julia> axis(Quaternion(10,1,1,0.5))
  0.3333333333333333
 ```
 """
-function axis(q::Quaternion)
-    v = imag(q)
-    return v / _vecnorm(q)
-end
+axis(q::Quaternion) = imag(q) / _vecnorm(q)
 
 # Quaternions form an involution algebra.
 # The conjugation operation is defined as $conj(re, im) = (re, -im)$
-@inline Base.conj(q::Quaternion)  = Quaternion(real(q), -imag(q))
+@inline Base.conj(q::Quaternion) = Quaternion(real(q), -imag(q))
 @inline function Base.conj!(q::Quaternion)
     q.q[2:end] .*= -1
     return q
@@ -147,9 +143,7 @@ end
 # Quaternion algebra  #
 #######################
 
-
 # As it is essentially R^4, the Quaternions have a natural vector space structure.
-#
 @inline Base.:+(q::Quaternion) = Quaternion(+q.q)
 @inline Base.:-(q::Quaternion) = Quaternion(-q.q)
 
@@ -166,13 +160,14 @@ end
 # Quaternions also form an algebra.
 # The difference in this case is
 # that multiplication is not commutative.
-@inline Base.:*(q::Quaternion, w::Quaternion) =
-    Quaternion(
-    [ q.q[1]*w.q[1] - q.q[2]*w.q[2] - q.q[3]*w.q[3] - q.q[4]*w.q[4]
-    , q.q[1]*w.q[2] + q.q[2]*w.q[1] + q.q[3]*w.q[4] - q.q[4]*w.q[3]
-    , q.q[1]*w.q[3] + q.q[3]*w.q[1] + q.q[4]*w.q[2] - q.q[2]*w.q[4]
-    , q.q[1]*w.q[4] + q.q[4]*w.q[1] + q.q[2]*w.q[3] - q.q[3]*w.q[2]
-    ])
+@inline function Base.:*(q::Quaternion, w::Quaternion)
+    return Quaternion(
+        [ q.q[1]*w.q[1] - q.q[2]*w.q[2] - q.q[3]*w.q[3] - q.q[4]*w.q[4]
+        , q.q[1]*w.q[2] + q.q[2]*w.q[1] + q.q[3]*w.q[4] - q.q[4]*w.q[3]
+        , q.q[1]*w.q[3] + q.q[3]*w.q[1] + q.q[4]*w.q[2] - q.q[2]*w.q[4]
+        , q.q[1]*w.q[4] + q.q[4]*w.q[1] + q.q[2]*w.q[3] - q.q[3]*w.q[2]
+        ])
+end
 
 # Inverse quaternion: inv(q) = q^{-1}
 @inline Base.inv(q::Quaternion) = conj(q) / abs2(q)
@@ -203,16 +198,16 @@ julia> abs(a)
 """
 function normalize(q::Quaternion; tolerance=1e-8)
     magnitude2 = abs2(q)
-    if abs( magnitude2 - 1.0 ) < tolerance
-        return q
+    if abs(magnitude2 - 1.0) > tolerance
+        return q / sqrt(magnitude2)
     end
-    return q / sqrt(magnitude2)
+    return q
 end
+
 function normalize!(q::Quaternion; tolerance=1e-8)
     magnitude2 = abs2(q)
-    if abs( magnitude2 - 1.0 ) > tolerance
-        magnitude = sqrt(magnitude2)
-        q.q ./= magnitude
+    if abs(magnitude2 - 1.0) > tolerance
+        q.q ./= sqrt(magnitude2)
     end
     return q
 end
@@ -223,13 +218,13 @@ end
 
 function Base.exp(q::Quaternion)
     nv = _vecnorm(q)
-    exp(real(q)) * Quaternion(cos(nv), sin(nv) * axis(q))
+    return exp(real(q)) * Quaternion(cos(nv), sin(nv) * axis(q))
 end
 
 function Base.log(q::Quaternion)
     nq = abs(q)
     nv = _vecnorm(q)
-    Quaternion( log(nq), acos(real(q) / nq) * axis(q) )
+    return Quaternion(log(nq), acos(real(q) / nq) * axis(q))
 end
 
 ########
@@ -286,7 +281,7 @@ function axis2quaternion(ax,angle::Real)
     if length(ax) != 3
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
-    cos(angle/2) + normalize(Quaternion(ax)) * sin(angle/2)
+    return cos(angle/2) + normalize(Quaternion(ax)) * sin(angle/2)
 end
 
 """
@@ -302,13 +297,13 @@ function rotate(q::Quaternion, v)
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
     q = normalize(q)
-    imag( q * Quaternion(0, v) * conj(q) )
+    return imag(q * Quaternion(0, v) * conj(q))
 end
 @inline function rotate( v
                        ; angle=0
                        , axis=[0, 0, 1]
                        )
-    rotate(axis2quaternion(axis, angle), v)
+    return rotate(axis2quaternion(axis, angle), v)
 end
 
 end

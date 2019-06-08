@@ -68,7 +68,7 @@ function plotmodel( m::Model
     end
     if !(SoR in [:inertialframe, :bodyframe, :both])
         error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :bodyframe, :inertialframe, :both.")
-        return
+        return nothing
     end
 
     local frames = convert(Int, ceil(fps*duration))
