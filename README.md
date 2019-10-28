@@ -1,7 +1,7 @@
 # Deformable body dynamics simulator
 
 ## Installation
-You can install this package via following commands inside the Julia REPL:
+You can install this package via the following commands inside the Julia REPL:
 
 ```julia
 import Pkg
@@ -23,7 +23,7 @@ _Geometry goes here._
 
 ## TODO
 - Write better documentation;
-- Find trajectory who optimizes energy from a parametrized family.
+- Find trajectory that optimizes energy from a parametrized family.
 
 ## Disclaimer
 No real cats were harmed during the development of this program.
