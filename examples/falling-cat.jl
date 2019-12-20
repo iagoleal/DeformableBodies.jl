@@ -29,10 +29,10 @@ const freq = 2*π/(tmax - tmax_r1)
 for i in 2:9
     if i in (2,3,4,5)
         e_1 = [1.,0.,0.]
-        ax  = rotate(r_0[2].pos - r_0[1].pos, axis=e_1, angle=θmax)
+        ax  = rotate(pos(r_0[2]) - pos(r_0[1]), axis=e_1, angle=θmax)
     elseif i in (6,7,8,9)
         e_1 = -[1.,0.,0.]
-        ax  = -rotate(r_0[6].pos - r_0[1].pos, axis=e_1, angle=θmax)
+        ax  = -rotate(pos(r_0[6]) - pos(r_0[1]), axis=e_1, angle=θmax)
     end
     ri(t) = let j = i
         if t < tmax_r1
@@ -74,7 +74,7 @@ println("Cat's internal frame: model.bodyframe")
 println("Inertial frame      : model.inertialframe")
 
 # Save the image as a gif
-println("\nPlotting result to \"gato.gif\"")
+println("\nSaving animation to \"gato.gif\"")
 anim = plotmodel(model, :both,
                  bodylines=bodylines,
                  duration=tmax,

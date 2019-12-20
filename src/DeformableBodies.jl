@@ -5,10 +5,10 @@ include("Quaternions.jl")
 using .Quaternions
 
 export Quaternion
-export imagq,
+export components,
+       imagq,
        axis,
        normalize,
-       normalize!,
        axistoquaternion,
        rotate
 
@@ -19,7 +19,6 @@ export PointMass
 export pos,
        mass,
        centralize,
-       centralize!,
        center_of_mass,
        inertia_tensor,
        angular_momentum

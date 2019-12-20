@@ -27,10 +27,9 @@ model = Model( t -> r_0 # Constant trajectories
 rotbodies, R, L = solve!(model)
 
 println("Trajectories are stored on the following variables:")
-println("Cat's internal frame: model.bodyframe")
-println("Inertial frame      : model.inertialframe\n")
+println("Internal frame: model.bodyframe")
+println("Inertial frame: model.inertialframe\n")
 
 # Save the image as a mp4
 println("\nPlotting result to \"sphere.mp4\"")
-anim = plotmodel(model, :both,
-                 saveas="sphere.mp4")
+anim = plotmodel(model, :both, saveas="sphere.mp4")

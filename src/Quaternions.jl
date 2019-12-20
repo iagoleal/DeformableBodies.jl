@@ -6,10 +6,10 @@ using Base: isreal, isinteger, isfinite, isnan, isinf
 using Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
 
 export Quaternion
-export imagq,
+export components,
+       imagq,
        axis,
        normalize,
-       normalize!,
        axistoquaternion,
        rotate
 
@@ -64,10 +64,28 @@ Base.big(q::Quaternion{T}) where {T<:Real} = Quaternion{big(T)}(q)
 # Components #
 ##############
 
-# Analogous to the Complex numbers,
-# we define the real part and imaginary part of q
-@inline Base.real(q::Quaternion) = q.q[1]
-@inline Base.imag(q::Quaternion) = q.q[2:end]
+# Interface method for list conversion
+"""
+    components(q)
+
+Return an array with the components of a [`Quaternion`](@ref).
+
+# Example
+```jldoctest
+julia> components(Quaternion(1.0, 2.0, 3.0, 4.0))
+4-element Array{Float64,1}:
+1.0
+2.0
+3.0
+4.0
+```
+"""
+@inline components(q::Quaternion) = q.q
+
+# Analogously to the Complex numbers,
+# we define the real and imaginary parts of a Quaternion
+@inline Base.real(q::Quaternion) = first(components(q))
+@inline Base.imag(q::Quaternion) = components(q)[2:end]
 
 """
     imagq(q)
@@ -84,17 +102,17 @@ julia> imagq(a)
 0 + 2i + 3j + 4k
 ```
 """
-@inline imagq(q::Quaternion) = Quaternion(0, q.q[2:end])
+@inline imagq(q::Quaternion) = Quaternion(imag(q))
 
 # Or a radius / angle decomposition
 
 # Geometricaly, abs(q) represents the length of a quaternion
 # when it is viewed as a vector in R^4
-@inline Base.abs2(q::Quaternion) = sum(x ^ 2 for x in q.q)
+@inline Base.abs2(q::Quaternion) = sum(x ^ 2 for x in components(q))
 @inline Base.abs(q::Quaternion)  = (sqrt ∘ abs2)(q)
 
 # Abs of imaginary part of q
-@inline _vecnorm(q::Quaternion) = (sqrt ∘ sum)(x ^ 2 for x in imag(q))
+@inline _vecnorm(q::Quaternion) = abs(imagq(q))
 
 @inline Base.angle(q::Quaternion) = 2 * atan(_vecnorm(q), real(q))
 
@@ -120,60 +138,55 @@ julia> axis(Quaternion(10,1,1,0.5))
 axis(q::Quaternion) = imag(q) / _vecnorm(q)
 
 # Quaternions form an involution algebra.
-# The conjugation operation is defined as $conj(re, im) = (re, -im)$
 @inline Base.conj(q::Quaternion) = Quaternion(real(q), -imag(q))
-@inline function Base.conj!(q::Quaternion)
-    q.q[2:end] .*= -1
-    return q
-end
 
 ###############
 # Comparisons #
 ###############
 
-@inline Base.:(==)(a::Quaternion, b::Quaternion) = (a.q == b.q)
+@inline Base.:(==)(a::Quaternion, b::Quaternion) = (components(a) == components(b))
 
 @inline Base.isreal(q::Quaternion) = iszero(imag(q))
 @inline Base.isinteger(q::Quaternion) = isreal(q) & isinteger(real(q))
-@inline Base.isfinite(q::Quaternion) = all(isfinite, q.q)
-@inline Base.isnan(z::Quaternion) = any(isnan, q.q)
-@inline Base.isinf(z::Quaternion) = any(isinf, q.q)
+@inline Base.isfinite(q::Quaternion) = all(isfinite, components(q))
+@inline Base.isnan(z::Quaternion) = any(isnan, components(q))
+@inline Base.isinf(z::Quaternion) = any(isinf, components(q))
 
 #######################
 # Quaternion algebra  #
 #######################
 
 # As it is essentially R^4, the Quaternions have a natural vector space structure.
-@inline Base.:+(q::Quaternion) = Quaternion(+q.q)
-@inline Base.:-(q::Quaternion) = Quaternion(-q.q)
+@inline Base.:+(q::Quaternion) = Quaternion(+components(q))
+@inline Base.:-(q::Quaternion) = Quaternion(-components(q))
 
-@inline Base.:+(a::Quaternion, b::Quaternion) = Quaternion(a.q .+ b.q)
-@inline Base.:-(a::Quaternion, b::Quaternion) = Quaternion(a.q .- b.q)
+@inline Base.:+(a::Quaternion, b::Quaternion) = Quaternion(components(a) .+ components(b))
+@inline Base.:-(a::Quaternion, b::Quaternion) = Quaternion(components(a) .- components(b))
 
-@inline Base.:*(k::Real, q::Quaternion) = Quaternion(k * q.q)
+@inline Base.:*(k::Real, q::Quaternion) = Quaternion(k * components(q))
 @inline Base.:*(q::Quaternion, k::Real) = k * q
 # And also division by a real number by multiplication with inverse
 @inline Base.:/(q::Quaternion, k::Real) = q * inv(k)
 @inline Base.:\(k::Real, q::Quaternion) = q / k
 
-# Analogously to Complex numbers,
-# Quaternions also form an algebra.
-# The difference in this case is
-# that multiplication is not commutative.
-@inline function Base.:*(q::Quaternion, w::Quaternion)
+# Analogously to Complex numbers, Quaternions also form an algebra.
+# The difference in this case is that multiplication is not commutative.
+@inline function Base.:*(a::Quaternion, b::Quaternion)
+    x = components(a)
+    y = components(b)
     return Quaternion(
-        [ q.q[1]*w.q[1] - q.q[2]*w.q[2] - q.q[3]*w.q[3] - q.q[4]*w.q[4]
-        , q.q[1]*w.q[2] + q.q[2]*w.q[1] + q.q[3]*w.q[4] - q.q[4]*w.q[3]
-        , q.q[1]*w.q[3] + q.q[3]*w.q[1] + q.q[4]*w.q[2] - q.q[2]*w.q[4]
-        , q.q[1]*w.q[4] + q.q[4]*w.q[1] + q.q[2]*w.q[3] - q.q[3]*w.q[2]
+        [ x[1]*y[1] - x[2]*y[2] - x[3]*y[3] - x[4]*y[4]
+        , x[1]*y[2] + x[2]*y[1] + x[3]*y[4] - x[4]*y[3]
+        , x[1]*y[3] + x[3]*y[1] + x[4]*y[2] - x[2]*y[4]
+        , x[1]*y[4] + x[4]*y[1] + x[2]*y[3] - x[3]*y[2]
         ])
 end
 
 # Inverse quaternion: inv(q) = q^{-1}
 @inline Base.inv(q::Quaternion) = conj(q) / abs2(q)
 
-@inline Base.:(/)(q1::Quaternion, q2::Quaternion) = q1 * inv(q2)
-@inline Base.:(\)(q1::Quaternion, q2::Quaternion) = inv(q1) * q2
+@inline Base.:(/)(a::Quaternion, b::Quaternion) = a * inv(b)
+@inline Base.:(\)(a::Quaternion, b::Quaternion) = inv(a) * b
 
 
 # When we talk about rotations,
@@ -197,17 +210,9 @@ julia> abs(a)
 ```
 """
 function normalize(q::Quaternion; tolerance=1e-8)
-    magnitude2 = abs2(q)
+    local magnitude2 = abs2(q)
     if abs(magnitude2 - 1.0) > tolerance
         return q / sqrt(magnitude2)
-    end
-    return q
-end
-
-function normalize!(q::Quaternion; tolerance=1e-8)
-    magnitude2 = abs2(q)
-    if abs(magnitude2 - 1.0) > tolerance
-        q.q ./= sqrt(magnitude2)
     end
     return q
 end
@@ -235,7 +240,7 @@ end
 function Base.show(io::IO, q::Quaternion)
     print(io, real(q))
     iscompact = get(io, :compact, false)
-    for (x, e_i) in zip(q.q[2:end], ['i', 'j', 'k'])
+    for (x, e_i) in zip(imag(q), ['i', 'j', 'k'])
         if signbit(x) && !isnan(x)
             print(io, iscompact ? "-" : " - ")
         else
@@ -299,10 +304,7 @@ function rotate(q::Quaternion, v)
     q = normalize(q)
     return imag(q * Quaternion(0, v) * conj(q))
 end
-@inline function rotate( v
-                       ; angle=0
-                       , axis=[0, 0, 1]
-                       )
+@inline function rotate(v ; angle=0, axis=[0, 0, 1])
     return rotate(axistoquaternion(axis, angle), v)
 end
 

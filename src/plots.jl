@@ -16,7 +16,7 @@ import Plots: RecipesBase
         for l in bodylines
             # No point in drawing a line with length zero...
             l[1] == l[2] && continue
-            local x = hcat(body[l[1]].pos, body[l[2]].pos)
+            local x = hcat(pos(body[l[1]]), pos(body[l[2]]))
             @Plots.series begin
                 (x[1,:], x[2,:], x[3,:])
             end

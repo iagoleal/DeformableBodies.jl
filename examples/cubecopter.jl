@@ -48,17 +48,16 @@ _, rotations, momentum = solve!(model)
 # (Only important for plotting)
 bodylines = Tuple[]
 for i = 1:length(r_0), j = i:length(r_0)
-    if count(a -> first(a) == last(a), zip(r_0[i].pos,r_0[j].pos)) == 2
+    if count(a -> first(a) == last(a), zip(pos(r_0[i]),pos(r_0[j]))) == 2
         push!(bodylines, (i,j))
     end
 end
 
 println("Trajectories are stored on the following variables:")
-println("Body's internal frame: model.bodyframe")
-println("Inertial frame       : model.inertialframe")
+println("Internal frame: model.bodyframe")
+println("Inertial frame: model.inertialframe")
 
-import Plots: pyplot
-pyplot()
+println("\nSaving animation to file \"cubecopter.gif\"")
 # Plotting time!
 anim = plotmodel( model, :both
                 , bodylines=bodylines
