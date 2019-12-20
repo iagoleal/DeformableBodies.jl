@@ -1,3 +1,5 @@
+using LinearAlgebra: I
+
 # A PointMass is a mass at a given point on space (R^3).
 """
     PointMass(m, x)
@@ -65,10 +67,8 @@ inertia tensor via
 I = \\sum m_i \\langle x_i, x_i \\rangle \\text{id} - x_i \\otimes x_i.
 ```
 """
-@inline function inertia_tensor(xs)
-    id = one(Array{T}(undef, 3, 3))
-    sum(mass(x) * (pos(x)'pos(x) * id - kron(pos(x)',pos(x))) for x in xs)
-end
+@inline inertia_tensor(xs) =
+    sum(mass(x) * (pos(x)'pos(x) * I - kron(pos(x)',pos(x))) for x in xs)
 
 """
     angular_momentum(xs, vs)
