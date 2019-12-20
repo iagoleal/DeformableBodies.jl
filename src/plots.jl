@@ -66,69 +66,49 @@ function plotmodel( m::Model
         error("Unknown plot type :" * string(SoR) * ".\n Try one of the following: :bodyframe, :inertialframe, :both.")
         return nothing
     end
-
     local frames = convert(Int, ceil(fps*duration))
-
-    # Get maximum of coordinates on all iterations
-    lim_max = [-Inf, -Inf, -Inf]
-    lim_min = [Inf, Inf, Inf]
-    for t in range(m.t_min, m.t_max, length=frames)
-        if SoR == :bodyframe
-            x = m.bodyframe(t)
-        elseif SoR == :inertialframe
-            x = m.inertialframe(t)
-        elseif SoR == :both
-            x = vcat(m.bodyframe(t), m.inertialframe(t))
-        end
-        max_t = maximum(hcat(pos.(x)...), dims=2)
-        min_t = minimum(hcat(pos.(x)...), dims=2)
-        lim_max = max.(lim_max, max_t)
-        lim_min = min.(lim_min, min_t)
-    end
+    xlim, ylim, zlim = getframelimits(m, SoR, frames)
 
     # Build the animation
     anime = Plots.Animation()
     for t in range(m.t_min, m.t_max, length=frames)
         plt =
-            if SoR == :bodyframe
-                Plots.plot(m.bodyframe(t),
-                           bodylines = bodylines,
-                           xlim  = (lim_min[1], lim_max[1]),
-                           ylim  = (lim_min[2], lim_max[2]),
-                           zlim  = (lim_min[3], lim_max[3]),
-                           title = "Body Frame";
-                           args...
-                          )
-            elseif SoR == :inertialframe
+            if SoR == :inertialframe
                 Plots.plot(m.inertialframe(t),
                            bodylines = bodylines,
-                           xlim  = (lim_min[1], lim_max[1]),
-                           ylim  = (lim_min[2], lim_max[2]),
-                           zlim  = (lim_min[3], lim_max[3]),
+                           xlim  = xlim,
+                           ylim  = ylim,
+                           zlim  = zlim,
                            title = "Inertial Frame";
                            args...
                           )
+            elseif SoR == :bodyframe
+                Plots.plot(m.bodyframe(t),
+                           bodylines = bodylines,
+                           xlim  = xlim,
+                           ylim  = ylim,
+                           zlim  = zlim,
+                           title = "Body Frame";
+                           args...
+                          )
             elseif SoR == :both
-                plt_bd = Plots.plot(m.bodyframe(t),
-                                    bodylines = bodylines,
-                                    xlim  = (lim_min[1], lim_max[1]),
-                                    ylim  = (lim_min[2], lim_max[2]),
-                                    zlim  = (lim_min[3], lim_max[3]),
-                                    title = "Body Frame";
-                                    args...
-                                   )
                 plt_it = Plots.plot(m.inertialframe(t),
                                     bodylines = bodylines,
-                                    xlim  = (lim_min[1], lim_max[1]),
-                                    ylim  = (lim_min[2], lim_max[2]),
-                                    zlim  = (lim_min[3], lim_max[3]),
+                                    xlim  = xlim,
+                                    ylim  = ylim,
+                                    zlim  = zlim,
                                     title = "Inertial Frame";
                                     args...
                                    )
-                Plots.plot(plt_bd, plt_it,
-                           layout=(1,2),
-                           link=:all
-                          )
+                plt_bd = Plots.plot(m.bodyframe(t),
+                                    bodylines = bodylines,
+                                    xlim  = xlim,
+                                    ylim  = ylim,
+                                    zlim  = zlim,
+                                    title = "Body Frame";
+                                    args...
+                                   )
+                Plots.plot(plt_bd, plt_it, layout=(1,2), link=:all)
             end
         # Push plot into animation
         Plots.frame(anime, plt)
@@ -138,8 +118,27 @@ function plotmodel( m::Model
     return anime
 end
 
+# Return limits of coordinates over all instants / frames for each axis
+function getframelimits(m::Model, SoR, frames)
+    local lim_min = [Inf, Inf, Inf]
+    local lim_max = [-Inf, -Inf, -Inf]
+    for t in range(m.t_min, m.t_max, length=frames)
+        if SoR == :bodyframe
+            x = m.bodyframe(t)
+        elseif SoR == :inertialframe
+            x = m.inertialframe(t)
+        elseif SoR == :both
+            x = vcat(m.bodyframe(t), m.inertialframe(t))
+        end
+        min_t = minimum(hcat(pos.(x)...), dims=2)
+        max_t = maximum(hcat(pos.(x)...), dims=2)
+        lim_min = min.(lim_min, min_t)
+        lim_max = max.(lim_max, max_t)
+    end
+    return ((lim_min[1], lim_max[1]), (lim_min[2], lim_max[2]), (lim_min[3], lim_max[3]))
+end
+
 function saveanimation(anime, saveas::String; fps::Int=30)
-    print(fps)
     local extension = match(r"\.[0-9a-z]+$", saveas)
     if extension != nothing
         extension = extension.match
