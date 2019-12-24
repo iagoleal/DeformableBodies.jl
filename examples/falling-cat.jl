@@ -55,6 +55,7 @@ model = Model( bodies
              , one(Quaternion)
              , zeros(3)
              )
+println(model)
 # And solve it
 rotbodies, R, L = solve!(model)
 
@@ -69,7 +70,7 @@ bodylines = [(1, 2),
              (6, 8),
              (6, 9)]
 
-println("Trajectories are stored on the following variables:")
+println("\nTrajectories are stored on the following variables:")
 println("Cat's internal frame: model.bodyframe")
 println("Inertial frame      : model.inertialframe")
 

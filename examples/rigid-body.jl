@@ -23,10 +23,11 @@ model = Model( t -> r_0 # Constant trajectories
              , axistoquaternion(unif_sphere(3), rand()*2π) # Random initial rotation
              , randn(3) + 3 # Random normally distributed (~N(3,1)) angular momentum
              )
+println(model)
 # And solve it
 rotbodies, R, L = solve!(model)
 
-println("Trajectories are stored on the following variables:")
+println("\nTrajectories are stored on the following variables:")
 println("Internal frame: model.bodyframe")
 println("Inertial frame: model.inertialframe\n")
 

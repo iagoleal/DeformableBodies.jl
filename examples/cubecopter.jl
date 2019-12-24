@@ -41,6 +41,7 @@ model = Model( bodies
              , one(Quaternion)
              , zeros(3)
              )
+println(model)
 # And solve it
 _, rotations, momentum = solve!(model)
 
@@ -53,7 +54,7 @@ for i = 1:length(r_0), j = i:length(r_0)
     end
 end
 
-println("Trajectories are stored on the following variables:")
+println("\nTrajectories are stored on the following variables:")
 println("Internal frame: model.bodyframe")
 println("Inertial frame: model.inertialframe")
 
