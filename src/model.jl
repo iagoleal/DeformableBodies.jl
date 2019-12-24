@@ -12,38 +12,38 @@ mutable struct Model
     t_min        ::Float64             # Initial time
     t_max        ::Float64             # Ending time
     q_0          ::Quaternion{Float64} # Initial Rotation
-    p_0          ::Array{Float64,1}    # Initial Angular Momentum
+    L_cm         ::Array{Float64,1}    # Center of Mass Angular Momentum
     inertialframe::Function            # Trajectories on inertial frame
-    Model(trjs, t0, tf, q_0, p_0) = new(trjs, t0, tf, q_0, p_0)
+    Model(trjs, t0, tf, q_0, L_cm) = new(trjs, t0, tf, normalize(q_0), L_cm)
 end
 
-function Model(trajectories::Array{Function,1}, t_min, t_max, q_0, p_0)
+function Model(trajectories::Array{Function,1}, t_min, t_max, q_0, L_cm)
     trajs = t -> [xi(t) for xi in trajectories]
-    return Model(trajs, t_min, t_max, q_0, p_0)
+    return Model(trajs, t_min, t_max, normalize(q_0), L_cm)
 end
 
 function eq_of_motion!(du,u,trajectories,t)
     q = Quaternion(u[1:4])
-    p = u[5:end]
+    Π = u[5:end]
     # Change particles to SoR with CM at origin
     r = centralize(trajectories(t))
     # Velocities must be calculated using a fixed SoR, so we don't centralize here
     v = velocity(trajectories, t)
     Iinv = (inv ∘ inertia_tensor)(r)
     L = angular_momentum(r, v)
-    ω = Iinv * (p - L)
+    ω = Iinv * (Π - L)
 
     dq = 0.5 * q * Quaternion(ω)
-    dp = (Iinv * p) × (p - L)
+    dΠ = Π × (Iinv * (Π - L))
 
     du[1:4]   .= components(dq)
-    du[5:end] .= dp
+    du[5:end] .= dΠ
     return du
 end
 
 @inline construct_problem(m::Model) =
     ODE.ODEProblem(eq_of_motion!
-                  , vcat(components(m.q_0), m.p_0)
+                   , vcat(components(m.q_0), rotate(conj(m.q_0), m.L_cm))
                   , (m.t_min, m.t_max)
                   , m.bodyframe
                   )
@@ -71,13 +71,13 @@ end
 using Base: show
 
 function Base.show(io::IO, m::Model)
-    print(io, "Model(",m.t_min,", ",m.t_max,", ",m.q_0,", ",m.p_0,")")
+    print(io, "Model(",m.t_min,", ",m.t_max,", ",m.q_0,", ",m.L_cm,")")
 end
 
 function Base.show(io::IO, ::MIME"text/plain", m::Model)
     println(io, "Deformable Body Model")
     println(io, "Initial Time: ", m.t_min)
     println(io, "Final Time  : ", m.t_max)
-    println(io, "Initial Data are\n    Rotation: ", m.q_0, "\n    Angular Momentum: ", m.p_0)
+    println(io, "Initial Data are\n    Rotation: ", m.q_0, "\n    Angular Momentum: ", m.L_cm)
     print(io, "Number of points: ", length(m.bodyframe(m.t_min)))
 end
