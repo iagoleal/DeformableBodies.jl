@@ -4,8 +4,7 @@ const ODE = OrdinaryDiffEq
 """
     Model
 
-Stores the data of a deformable body problem
-before and after solving.
+Store the data of a deformable body problem before and after solving.
 """
 mutable struct Model
     bodyframe    ::Function            # Trajectories on body frame
@@ -49,11 +48,11 @@ end
                   )
 
 """
-    solve!(m::Model; reltol, abstol, solver)
+    solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=Tsit5())
 
-Receives a [`Model`](@ref), calculates the
-trajectory of the body on a inertial frame
-and stores it in the variable `m.inertialframe`.
+Receive a [`Model`](@ref), calculate the
+trajectory of the body on an inertial frame
+and store it in the variable `m.inertialframe`.
 """
 function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     prob = construct_problem(m)

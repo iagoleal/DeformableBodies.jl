@@ -36,30 +36,33 @@ end
 """
     plotmodel(model, SoR; kw...)
 
-Receives a [`Model`](@ref) and returns a [`Animation`](@ref) from its data.
-The argument `SoR` means "system of reference" and accepts one of the following symbols: `:bodyframe`, `:inertialframe`, `:both`.
+Receive a [`Model`](@ref) and return a `Plots.Animation` from its data.
 
-The aditional arguments currently available are
-- `fps`: frames per second.
+# Arguments
+
+- `SoR`: means "system of reference" and accepts one of the following symbols: `:bodyframe`, `:inertialframe`, `:both`.
+- `fps`: frames per second. Default is `24`.
 - `duration`: length of animation in seconds. Default is `model.t_max`.
-- `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. By default, file is not saved.
-- `bodylines`: Array of points pairs. Stores the data who says which points should be linked.
+- `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. If left blank, file is not saved.
+- `bodylines`: Array of points pairs. Stores the data who says which points should be linked. Default is empty.
 - `markersize_is_mass`: Says if attribute `markersize` should be weighted by the mass of each particle. Default is `true`.
 
-Additionally, any keyword argument supported by [`Plots.plot`](@ref)
+Additionally, any keyword argument supported by `Plots.plot`
 is accepted and will be repassed to the plot.
 
 # Examples
-```jldoctest
+
+```julia
 julia> plotmodel(m, :both, fps=15, saveas="example.gif", color=:green,viewangle=(30,60))
 ```
 """
 function plotmodel( m::Model
-                  , SoR=:both # System of Reference
+                  , SoR # System of Reference
                   ; fps=24
                   , duration=m.t_max
                   , saveas=nothing
                   , bodylines=nothing
+                  , markersize_is_mass=true
                   , args... # Additional keyword arguments to be passed to Plots.plot
                   )
     if !(SoR in [:inertialframe, :bodyframe, :both])
@@ -138,6 +141,15 @@ function getframelimits(m::Model, SoR, frames)
     return ((lim_min[1], lim_max[1]), (lim_min[2], lim_max[2]), (lim_min[3], lim_max[3]))
 end
 
+"""
+    saveanimation(anime, saveas; fps=30)
+
+Receive an `Animation` and save it as a file.
+
+Supported formats are 'gif', 'mp4' and 'mov'.
+The extension is automatically detected from `saveas`
+and, in case of ambiguity, defaults to '.gif'.
+"""
 function saveanimation(anime, saveas::String; fps::Int=30)
     local extension = match(r"\.[0-9a-z]+$", saveas)
     if extension != nothing

@@ -74,10 +74,10 @@ Return an array with the components of a [`Quaternion`](@ref).
 ```jldoctest
 julia> components(Quaternion(1.0, 2.0, 3.0, 4.0))
 4-element Array{Float64,1}:
-1.0
-2.0
-3.0
-4.0
+ 1.0
+ 2.0
+ 3.0
+ 4.0
 ```
 """
 @inline components(q::Quaternion) = q.q
@@ -90,7 +90,7 @@ julia> components(Quaternion(1.0, 2.0, 3.0, 4.0))
 """
     imagq(q)
 
-Returns imaginary part of [`Quaternion`](@ref)
+Return imaginary part of [`Quaternion`](@ref)
 as a [`Quaternion`](@ref) with no real part.
 
 # Examples
@@ -120,7 +120,7 @@ julia> imagq(a)
 """
     axis(q)
 
-Returns the unit vector on the direction
+Return the unit vector on the direction
 of the imaginary part of a [`Quaternion`](@ref).
 
 # Examples
@@ -195,7 +195,7 @@ end
 """
     normalize(q)
 
-Divides `q` by its norm to return a unit quaternion ``q / |q|``.
+Return a [`Quaternion`](@ref) with the same direction as `q` but unit norm.
 
 # Examples
 ```jldoctest
@@ -278,9 +278,9 @@ end
 """
     axistoquaternion(axis, angle)
 
-Receives an axis `v` and angle `θ`
-and returns the [`Quaternion`](@ref)
-who corresponds to a rotation of `θ` around `v`.
+Receive an axis `v` and angle `θ`
+and return the [`Quaternion`](@ref)
+corresponding to a rotation of `θ` around `v`.
 """
 function axistoquaternion(ax, angle::Real)
     if length(ax) != 3
