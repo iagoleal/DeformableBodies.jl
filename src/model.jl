@@ -43,7 +43,7 @@ end
 
 @inline construct_problem(m::Model) =
     ODE.ODEProblem(eq_of_motion!
-                   , vcat(components(m.q_0), rotate(conj(m.q_0), m.L_cm))
+                   , vcat(components(m.q_0), rotate(m.L_cm, conj(m.q_0)))
                   , (m.t_min, m.t_max)
                   , m.bodyframe
                   )
@@ -63,7 +63,7 @@ function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     # Evolution of angular momentum
     momentum(t) = solution(t)[5:end]
     # Store solution on model
-    m.inertialframe = t -> [PointMass(mass(x), rotate(R(t), pos(x))) for x in m.bodyframe(t)]
+    m.inertialframe = t -> [PointMass(mass(x), rotate(pos(x), R(t))) for x in m.bodyframe(t)]
     return m.inertialframe, R, momentum
 end
 

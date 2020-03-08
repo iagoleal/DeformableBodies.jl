@@ -94,9 +94,9 @@ function centralize(xs)
     return map(r -> PointMass(mass(r), pos(r) - cm), xs)
 end
 
-# Extend Quaternion.rotate to deal with point masses
+# Extend Quaternions.rotate to deal with point masses
 using .Quaternions: rotate
 
 @inline function Quaternions.rotate(x::PointMass; angle=0, axis=[0,0,0])
-    return PointMass(mass(x), rotate(pos(x); angle=angle, axis=axis))
+    return PointMass(mass(x), Quaternions.rotate(pos(x); angle=angle, axis=axis))
 end

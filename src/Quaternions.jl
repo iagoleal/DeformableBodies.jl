@@ -290,22 +290,24 @@ function axistoquaternion(ax, angle::Real)
 end
 
 """
-    rotate(q::Quaternion, v::Vector)
+    rotate(v::Vector, q::Quaternion)
     rotate(v::Vector; axis, angle)
 
 Rotate a vector `v` by a quaternion `q`.
-The quaternion may be given directly
-or as an axis and an angle.
+The quaternion may be given directly or as an axis and an angle.
 """
-function rotate(q::Quaternion, v)
+function rotate end
+
+function rotate(v, q::Quaternion)
     if length(v) != 3
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
     q = normalize(q)
     return imag(q * Quaternion(0, v) * conj(q))
 end
-@inline function rotate(v ; angle=0, axis=[0, 0, 1])
-    return rotate(axistoquaternion(axis, angle), v)
+
+@inline function rotate(v; axis, angle)
+    return rotate(v, axistoquaternion(axis, angle))
 end
 
 end
