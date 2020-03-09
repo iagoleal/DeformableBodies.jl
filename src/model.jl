@@ -13,6 +13,8 @@ mutable struct Model
     q_0          ::Quaternion{Float64} # Initial Rotation
     L_cm         ::Array{Float64,1}    # Center of Mass Angular Momentum
     inertialframe::Function            # Trajectories on inertial frame
+    rotation     ::Function            # Rotations from body to inertial frame
+    momentum     ::Function            # Evolution of momentum variables
     Model(trjs, t0, tf, q_0, L_cm) = new(trjs, t0, tf, normalize(q_0), L_cm)
 end
 
@@ -58,12 +60,12 @@ function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     prob = construct_problem(m)
     solution = ODE.solve(prob, solver, reltol=reltol, abstol=abstol)
     # Evolution of rotations
-    R(t) = Quaternion(solution(t)[1:4])
+    m.rotation = t -> Quaternion(solution(t)[1:4])
     # Evolution of angular momentum
-    momentum(t) = solution(t)[5:end]
+    m.momentum = t -> solution(t)[5:end]
     # Store solution on model
-    m.inertialframe = t -> [PointMass(mass(x), rotate(pos(x), R(t))) for x in m.bodyframe(t)]
-    return m.inertialframe, R, momentum
+    m.inertialframe = t -> map(x -> rotate(x, m.rotation(t)), m.bodyframe(t))
+    return m.inertialframe, m.rotation, m.momentum
 end
 
 # Printing Models
