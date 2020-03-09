@@ -5,12 +5,15 @@ using Base: ==, +, -, *, /, \
 using Base: isreal, isinteger, isfinite, isnan, isinf
 using Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
 
+using LinearAlgebra: I
+
 export Quaternion
 export components,
        imagq,
        axis,
        normalize,
        axistoquaternion,
+       quaterniontomatrix,
        rotate
 
 # We define quaternions to be a set of 4 real numbers.
@@ -271,10 +274,9 @@ end
 # Rotations #
 #############
 
-# Any rotatation may be represented by a quaternion.
-# If we have a direction on the sphere and an angle θ,
-# it gives us an rotation matrix R(v,θ) which
-# may be represented according to
+# Skew-symmetric matrix equivalent to cross product from the left
+_crossmatrix(v) = [0 -v[3] v[2]; v[3] 0 -v[1]; -v[2] v[1] 0]
+
 """
     axistoquaternion(axis, angle)
 
@@ -287,6 +289,19 @@ function axistoquaternion(ax, angle::Real)
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
     return cos(angle/2) + normalize(Quaternion(ax)) * sin(angle/2)
+end
+
+"""
+    quaterniontomatrix(q::Quaternion)
+
+Return the rotation matrix associated with a [`Quaternion`](@ref).
+"""
+function quaterniontomatrix(q::Quaternion)
+    q = normalize(q)
+    t = real(q)
+    v = imag(q)
+    v_cross =  _crossmatrix(v)
+    return kron(v',v) + t^2*I + 2*t*v_cross + v_cross^2
 end
 
 """

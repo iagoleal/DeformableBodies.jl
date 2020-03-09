@@ -10,6 +10,7 @@ export components,
        axis,
        normalize,
        axistoquaternion,
+       quaterniontomatrix,
        rotate
 
 # Physical utilities
