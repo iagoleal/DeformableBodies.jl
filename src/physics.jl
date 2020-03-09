@@ -1,4 +1,4 @@
-using LinearAlgebra: I
+using LinearAlgebra: I, cross, ×
 
 # A PointMass is a mass at a given point on space (R^3).
 """
@@ -33,14 +33,6 @@ Returns position of a [`PointMass`](@ref).
 Returns mass of a [`PointMass`](@ref).
 """
 @inline mass(p::PointMass) = p.mass
-
-# Cross Product of 3-dimensional vectors
-@inline cross(a,b) =
-    [ a[2]*b[3] - a[3]*b[2]
-    , a[3]*b[1] - a[1]*b[3]
-    , a[1]*b[2] - a[2]*b[1]
-    ]
-@inline a × b = cross(a,b)
 
 # Velocity of a set of trajectories
 velocity(xs, t; ε=1e-6) =
