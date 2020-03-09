@@ -1,3 +1,13 @@
+"""
+Submodule of `DeformableBodies.jl` implementing quaternion algebra.
+
+Quaternions are a 4-dimensional normed division algebra which extend the complex numbers.
+They may be used as a representation of rotations on 3-dimensional space.
+
+# Exports
+$(EXPORTS)
+
+"""
 module Quaternions
 
 using Base: promote_rule, widen, float, big, show
@@ -6,6 +16,7 @@ using Base: isreal, isinteger, isfinite, isnan, isinf
 using Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
 
 using LinearAlgebra: I
+using DocStringExtensions
 
 export Quaternion
 export components,
