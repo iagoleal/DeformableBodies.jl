@@ -11,6 +11,7 @@ export components,
        normalize,
        axistoquaternion,
        quaterniontomatrix,
+       matrixtoquaternion,
        rotate
 
 # Physical utilities

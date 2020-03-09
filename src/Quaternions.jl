@@ -14,6 +14,7 @@ export components,
        normalize,
        axistoquaternion,
        quaterniontomatrix,
+       matrixtoquaternion,
        rotate
 
 # We define quaternions to be a set of 4 real numbers.
@@ -302,6 +303,35 @@ function quaterniontomatrix(q::Quaternion)
     v = imag(q)
     v_cross =  _crossmatrix(v)
     return kron(v',v) + t^2*I + 2*t*v_cross + v_cross^2
+end
+
+"""
+    matrixtoquaternion(R)
+
+Given a rotation matrix `R`,
+return a quaternion `q` such that `rotate(v,q) = R*v` for all `v`.
+
+The matrix `R` is assumed to be orthogonal
+but, for efficiency reasons, no check is made to guarantee that.
+
+Since there are, in general, two quaternions representing the same rotation matrix,
+it is not guaranteed that `matrixtoquaternion ∘ quaterniontomatrix` equals the identity.
+"""
+function matrixtoquaternion(r)
+    if     r[2,2] > -r[3,3] && r[1,1] > -r[2,2] && r[1,1] > -r[3,3]
+        z = 1 + r[1,1] + r[2,2] + r[3,3]
+        q = 0.5 / sqrt(z) * Quaternion(z, r[3,2]-r[2,3], r[1,3]-r[3,1], r[2,1]-r[1,2])
+    elseif r[2,2] < -r[3,3] && r[1,1] >  r[2,2] && r[1,1] >  r[3,3]
+        z = 1 + r[1,1] - r[2,2] - r[3,3]
+        q = 0.5 / sqrt(z) * Quaternion(r[3,2]-r[2,3], z, r[2,1]+r[1,2], r[3,1]+r[1,3])
+    elseif r[2,2] >  r[3,3] && r[1,1] <  r[2,2] && r[1,1] < -r[3,3]
+        z = 1 - r[1,1] + r[2,2] - r[3,3]
+        q = 0.5 / sqrt(z) * Quaternion(r[1,3]-r[3,1], r[2,1]+r[1,2], z, r[3,2]+r[2,3])
+    else
+        z = 1 - r[1,1] - r[2,2] + r[3,3]
+        q = 0.5 / sqrt(z) * Quaternion(r[2,1]-r[1,2], r[3,1]+r[1,3], r[3,2]+r[2,3], z)
+    end
+    return q
 end
 
 """
