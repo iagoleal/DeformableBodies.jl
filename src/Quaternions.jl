@@ -36,7 +36,7 @@ export components,
 
 Quaternion type with components of type `T`.
 """
-struct Quaternion{T} <:Number where T <: Real
+struct Quaternion{T} <:Number where {T<:Real}
     q::Array{T, 1}
     function Quaternion{T}(x::AbstractVector) where T <: Real
         if length(x) == 4
@@ -286,9 +286,6 @@ end
 # Rotations #
 #############
 
-# Skew-symmetric matrix equivalent to cross product from the left
-_crossmatrix(v) = [0 -v[3] v[2]; v[3] 0 -v[1]; -v[2] v[1] 0]
-
 """
     axistoquaternion(axis, angle)
 
@@ -315,6 +312,9 @@ function quaterniontomatrix(q::Quaternion)
     v_cross =  _crossmatrix(v)
     return kron(v',v) + t^2*I + 2*t*v_cross + v_cross^2
 end
+
+# Skew-symmetric matrix equivalent to cross product from the left
+@inline _crossmatrix(v) = [0 -v[3] v[2]; v[3] 0 -v[1]; -v[2] v[1] 0]
 
 """
     matrixtoquaternion(R)

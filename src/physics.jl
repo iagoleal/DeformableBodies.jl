@@ -50,8 +50,7 @@ and return their center of mass through formula
 cm(x) = \frac{1}{\sum m_i}\sum m_i x_i.
 ```
 """
-@inline center_of_mass(xs) =
-    sum(mass.(xs) .* pos.(xs)) / sum(mass.(xs))
+@inline center_of_mass(xs) = sum(mass.(xs) .* pos.(xs)) / sum(mass.(xs))
 
 @doc raw"""
     inertia_tensor(xs)
@@ -84,10 +83,7 @@ Receive a system of [`PointMass`](@ref)es
 and translate it such that the center of mass
 is fixed on the origin.
 """
-@inline function centralize(xs)
-    cm = center_of_mass(xs)
-    return map(r -> PointMass(mass(r), pos(r) - cm), xs)
-end
+@inline centralize(xs) = map(r -> PointMass(mass(r), pos(r) - center_of_mass(xs)), xs)
 
 # Extend Quaternions.rotate to deal with point masses
 using .Quaternions: rotate
