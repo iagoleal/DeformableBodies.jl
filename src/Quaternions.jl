@@ -35,6 +35,10 @@ export components,
     Quaternion{T<:Real} <: Number
 
 Quaternion type with components of type `T`.
+
+This type overloads all the arithmetic operations
+as well as the methods defined for Complex numbers
+that still make sense for Quaternions.
 """
 struct Quaternion{T} <:Number where {T<:Real}
     q::Array{T, 1}
@@ -130,7 +134,6 @@ julia> imagq(a)
 @inline _vecnorm(q::Quaternion) = abs(imagq(q))
 
 @inline Base.angle(q::Quaternion) = 2 * atan(_vecnorm(q), real(q))
-
 
 """
     axis(q)

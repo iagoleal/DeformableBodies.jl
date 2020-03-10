@@ -4,6 +4,16 @@ using LinearAlgebra: I, cross, ×
     PointMass(m, x)
 
 Wrapper over a mass and a position on ``R^3``.
+
+This type overloads [`Quaternions.rotate`](@ref)
+to rotate only its position.
+```jldoctest
+julia> a = PointMass(10, [1., 0, 0])
+PointMass{Float64}(10.0, [1.0, 0.0, 0.0])
+
+julia> rotate(a; axis=[0., 0., 1.], angle=π/2)
+PointMass{Float64}(10.0, [2.220446049250313e-16, 1.0, 0.0])
+```
 """
 struct PointMass{T} <: Any where {T<:Real}
     mass::T
@@ -34,12 +44,13 @@ Return mass of a [`PointMass`](@ref).
 @inline mass(p::PointMass) = p.mass
 
 """
-    velocity(xs, t; ε=1e-6)
+    velocity(xs, t; δ=1e-6)
 
 Numerically approximate the velocity for a set `xs` of trajectories at time `t`.
-The variable `ε` denotes the desired precision.
+The variable `δ` denotes the step for the finite differences interval.
 """
-velocity(xs, t; ε=1e-6) = map((a,b) -> (pos(a) - pos(b))/(2*ε), xs(t+ε), xs(t-ε))
+@inline velocity(xs, t; δ=1e-6) =
+    map((a,b) -> (pos(a) - pos(b))/(2*δ), xs(t+δ), xs(t-δ))
 
 @doc raw"""
     center_of_mass(xs)

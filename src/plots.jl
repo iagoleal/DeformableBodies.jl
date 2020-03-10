@@ -144,7 +144,7 @@ end
 """
     saveanimation(anime, saveas; fps=30)
 
-Receive an `Animation` and save it as a file.
+Receive an `Plots.Animation` and save it as a file.
 
 Supported formats are 'gif', 'mp4' and 'mov'.
 The extension is automatically detected from `saveas`
