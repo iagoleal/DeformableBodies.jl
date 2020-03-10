@@ -92,6 +92,8 @@ end
 # Extend Quaternions.rotate to deal with point masses
 using .Quaternions: rotate
 
-@inline function Quaternions.rotate(x::PointMass; angle=0, axis=[0,0,0])
-    return PointMass(mass(x), Quaternions.rotate(pos(x); angle=angle, axis=axis))
-end
+@inline Quaternions.rotate(x::PointMass, q::Quaternion) =
+    PointMass(mass(x), Quaternions.rotate(pos(x), q))
+
+@inline Quaternions.rotate(x::PointMass; angle, axis) =
+     PointMass(mass(x), Quaternions.rotate(pos(x); angle=angle, axis=axis))
