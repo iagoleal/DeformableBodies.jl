@@ -34,5 +34,6 @@ export solve!
 # Plotting utilities
 include("plots.jl")
 
-export plotmodel
+export plotmodel,
+       saveanimation
 end
