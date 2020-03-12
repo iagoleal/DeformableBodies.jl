@@ -14,11 +14,13 @@ all the rotations in this package are represented using unit quaternions.
 ## Example
 
 The figure below represents the movement
-that a falling cat does when righting itself midair
+that a falling cat[^disclaimer] does when righting itself midair
 both from the perspective of a frame _rotating together with the cat_
 and from an inertial frame.
 
 ![Falling cat dynamics](assets/falling-cat.gif)
+
+[^disclaimer]: No real cats were harmed during the development of this program.
 
 ## Installation
 This package can be installed using the Julia Package Manager.
