@@ -1,4 +1,13 @@
-# Deformable body dynamics simulator
+# DeformableBodies
+
+| **Documentation**                 |
+|:--------------------------------: |
+| [![][docs-dev-img]][docs-dev-url] |
+
+
+`DeformableBodies.jl` is a Julia package dedicated
+to the study and solution of a special class of problems from classical mechanics:
+_deformable bodies_.
 
 ## Installation
 You can install this package via the following commands inside the Julia REPL:
@@ -8,22 +17,5 @@ import Pkg
 Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
 ```
 
-## Usage
-
-The folder `examples/`
-contains some examples of how to construct a model.
-
-The result of a simulation is summarized on the following figure,
-made with the example file `examples/cubecopter.jl`:
-
-![Cube with spinning helix](figs/cubecopter.gif)
-
-## Mathematics behind the program
-_Geometry goes here._
-
-## TODO
-- Write better documentation;
-- Find trajectory that optimizes energy from a parameterized family.
-
-## Disclaimer
-No real cats were harmed during the development of this program.
+[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://iagoleal.github.io/DeformableBodies.jl/dev/
