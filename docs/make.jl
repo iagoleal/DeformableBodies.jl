@@ -25,25 +25,28 @@ for data in ("logo" => "black", "logo-dark" => "white")
         println("Sucessfully created asset: $(data.first).")
     end
 end
+
 # Turn logo into icon
 if !isfile(joinpath(assets_dir, "favicon.ico")) && isfile(joinpath(assets_dir, "logo.svg"))
     run(`convert -background none $(joinpath(assets_dir, "logo.svg")) -define icon:auto-resize $(joinpath(assets_dir, "favicon.ico"))`)
     println("Sucessfully created asset: ico.")
 end
+
+# Set the right metadata for doctests
 DocMeta.setdocmeta!(DeformableBodies, :DocTestSetup, :(using DeformableBodies); recursive=true)
 
 makedocs(
     sitename = "DeformableBodies.jl",
     authors  = "Iago Leal de Freitas",
     format   = Documenter.HTML(
-        prettyurls = get(ENV, "CI", nothing) == "true",
-        assets     = ["assets/favicon.ico"]
+        prettyurls = !("local" in ARGS),    # Deactivate on local builds
+        assets     = ["assets/favicon.ico"],
+        canonical  = "https://iagoleal.github.io/DeformableBodies.jl/dev/"
     ),
     modules  = [DeformableBodies, DeformableBodies.Quaternions],
     pages    = [
         "Introduction" => "index.md",
         "Tutorial" => "tutorial-cubecopter.md",
-        "theory.md",
         "Reference" => [
             "Quaternions" => "ref-quaternions.md",
             "DeformableBodies" => "ref-models.md"
@@ -51,9 +54,7 @@ makedocs(
    ]
 )
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
-#=deploydocs(
-    repo = "<repository url>"
-)=#
+# Deploy site to Github Pages
+deploydocs(
+    repo = "github.com/iagoleal/DeformableBodies.jl.git",
+)

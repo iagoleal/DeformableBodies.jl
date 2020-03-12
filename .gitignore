@@ -1,2 +1,4 @@
 *.gif
 Manifest.toml
+docs/build/
+docs/site/
