@@ -296,12 +296,16 @@ Receive an axis `v` and angle `θ`
 and return the [`Quaternion`](@ref)
 corresponding to a rotation of `θ` around `v`.
 """
+function axistoquaternion end
+
 function axistoquaternion(ax, angle::Real)
     if length(ax) != 3
         error("Error: Axis must be a 3-dimensional vector.\nDimension given is $(length(ax))")
     end
     return cos(angle/2) + normalize(Quaternion(ax)) * sin(angle/2)
 end
+
+@inline axistoquaternion(;axis, angle) = axistoquaternion(axis,angle)
 
 """
     quaterniontomatrix(q::Quaternion)
@@ -347,6 +351,7 @@ function matrixtoquaternion(r)
     end
     return q
 end
+# https://arxiv.org/pdf/math/0701759.pdf
 
 """
     rotate(v::Vector, q::Quaternion)
