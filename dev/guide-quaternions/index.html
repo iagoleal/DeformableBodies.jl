@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Representing rotations by quaternions · DeformableBodies.jl</title><link rel="canonical" href="https://iagoleal.github.io/DeformableBodies.jl/dev/guide-quaternions/index.html"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img class="docs-light-only" src="../assets/logo.svg" alt="DeformableBodies.jl logo"/><img class="docs-dark-only" src="../assets/logo-dark.svg" alt="DeformableBodies.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">DeformableBodies.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../tutorial-cubecopter/">Tutorial</a></li><li><span class="tocitem">Guides</span><ul><li class="is-active"><a class="tocitem" href>Representing rotations by quaternions</a><ul class="internal"><li><a class="tocitem" href="#The-rotate-function-1"><span>The <code>rotate</code> function</span></a></li><li><a class="tocitem" href="#Representing-the-identity-rotation-1"><span>Representing the identity rotation</span></a></li><li><a class="tocitem" href="#Composition-of-rotations-1"><span>Composition of rotations</span></a></li><li><a class="tocitem" href="#Axis-angle-representation-1"><span>Axis-angle representation</span></a></li><li><a class="tocitem" href="#Converting-between-matrices-and-quaternions-1"><span>Converting between matrices and quaternions</span></a></li><li><a class="tocitem" href="#Rotating-a-PointMass-1"><span>Rotating a PointMass</span></a></li></ul></li></ul></li><li><span class="tocitem">Reference</span><ul><li><a class="tocitem" href="../ref-quaternions/">Quaternions</a></li><li><a class="tocitem" href="../ref-models/">DeformableBodies</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Guides</a></li><li class="is-active"><a href>Representing rotations by quaternions</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Representing rotations by quaternions</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/iagoleal/DeformableBodies.jl/blob/master/docs/src/guide-quaternions.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Representing-rotations-by-quaternions-1"><a class="docs-heading-anchor" href="#Representing-rotations-by-quaternions-1">Representing rotations by quaternions</a><a class="docs-heading-anchor-permalink" href="#Representing-rotations-by-quaternions-1" title="Permalink"></a></h1><p>The most usual ways to represent a rotation in three-dimensional space are <a href="https://en.wikipedia.org/wiki/Rotation_matrix">rotations matrices</a> or <a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>. In this package, nevertheless, they are represented using unit quaternions.</p><p>Quaternions are a four-dimensional non-commutative algebra with the property that any rotation may be represented by a quaternion of norm 1. Some of their advantages consist in that we only need 4 parameters to represent a quaternion (as opposed to the 9 needed by rotation matrices) and that they do not suffer from the phenomenon of <a href="https://en.wikipedia.org/wiki/Gimbal_lock">gimbal lock</a> (as opposed to Euler angles).</p><p>If a quaternion <span>$q$</span> represents a rotation matrix <span>$R$</span>, their action on a vector is defined as</p><div>\[R v = q v q^{-1}.\]</div><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>This package assumes that your coordinate system follows the right-hand rule. If, for whatever reason, you want to use a left-handed system, <span>$q$</span> and <span>$q^{-1}$</span> must be transposed on the above formula.</p></div></div><h2 id="The-rotate-function-1"><a class="docs-heading-anchor" href="#The-rotate-function-1">The <code>rotate</code> function</a><a class="docs-heading-anchor-permalink" href="#The-rotate-function-1" title="Permalink"></a></h2><p>All rotations on <code>DeformableBodies.jl</code> are done by the function <a href="../ref-quaternions/#DeformableBodies.Quaternions.rotate"><code>rotate</code></a>. Its signature consists of</p><pre><code class="language-julia">rotate(v::Vector, q::Quaternion, center::Vector)</code></pre><p>This function rotates the vector <code>v</code> by the rotation represented by <code>q</code> in the frame of reference centered on <code>center</code>.</p><p>If the third argument is left blank, it defaults to the origin.</p><pre><code class="language-julia-repl">julia&gt; v = [3,0,0]
+3-element Array{Int64,1}:
+ 3
+ 0
+ 0
+
+julia&gt; q = Quaternion(1,2,3,4)
+1 + 2i + 3j + 4k
+
+julia&gt; rotate(v, q, [0,0,0])
+3-element Array{Float64,1}:
+ -2.0
+  2.0
+  1.0
+
+julia&gt; rotate(v, q)
+3-element Array{Float64,1}:
+ -2.0
+  2.0
+  1.0</code></pre><h2 id="Representing-the-identity-rotation-1"><a class="docs-heading-anchor" href="#Representing-the-identity-rotation-1">Representing the identity rotation</a><a class="docs-heading-anchor-permalink" href="#Representing-the-identity-rotation-1" title="Permalink"></a></h2><p>The identity rotation is the matrix <span>$I$</span> satisfying <span>$I v = v$</span> for all <span>$v$</span>. This is represented by the quaternion <span>$1$</span>, which can be gotten using Julia&#39;s multiple dispatch via the expression <code>one(Quaternion)</code>.</p><pre><code class="language-julia-repl">julia&gt; q = one(Quaternion)
+1 + 0i + 0j + 0k
+
+julia&gt; rotate([1,2,3], q)
+3-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0</code></pre><h2 id="Composition-of-rotations-1"><a class="docs-heading-anchor" href="#Composition-of-rotations-1">Composition of rotations</a><a class="docs-heading-anchor-permalink" href="#Composition-of-rotations-1" title="Permalink"></a></h2><p>The composition of rotations translates to the quaternion world as the product of quaternions. Thus, it is the same to rotate a vector by <span>$q_1$</span> and then by <span>$q_2$</span> and to rotate by <span>$q_2 * q_1$</span>.</p><pre><code class="language-julia-repl">julia&gt; v = [9, 0, 0]
+3-element Array{Int64,1}:
+ 9
+ 0
+ 0
+
+julia&gt; q1 = Quaternion(1,2,3,4)
+1 + 2i + 3j + 4k
+
+julia&gt; q2 = Quaternion(4,3,2,1)
+4 + 3i + 2j + 1k
+
+julia&gt; rotate(v, q2*q1)
+3-element Array{Float64,1}:
+ -1.0
+ -4.0
+  8.0
+
+julia&gt; rotate(rotate(v, q1), q2)
+3-element Array{Float64,1}:
+ -1.0
+ -4.0
+  8.0</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Rotations are non-commutative. Applying <span>$q_2$</span> after <span>$q_1$</span> is the same as multiplying <span>$q_2$</span> to the <strong>left</strong> of <span>$q_1$</span>.</p></div></div><h2 id="Axis-angle-representation-1"><a class="docs-heading-anchor" href="#Axis-angle-representation-1">Axis-angle representation</a><a class="docs-heading-anchor-permalink" href="#Axis-angle-representation-1" title="Permalink"></a></h2><p>An important property of three-dimensional space it that every rotation fixes a line. Therefore, they accept an axis-angle representation. That is, a rotation <span>$R$</span> is defined by a unit vector <span>$\hat{n}$</span> and an angle <span>$\theta$</span> such that <span>$R$</span> rotates a vector counterclockwise by an amount of <span>$\theta$</span> around the line defined by <span>$\hat{n}$</span>.</p><p>To get the quaternion representing an rotation of <code>θ</code> around <code>n</code>, use the method <a href="../ref-quaternions/#DeformableBodies.Quaternions.axistoquaternion"><code>axistoquaternion</code></a>. You may pass an unormalized vector and the method will normalize it.</p><pre><code class="language-julia-repl">julia&gt; q = axistoquaternion(axis = [0,0,2], angle = π/2)
+0.7071067811865476 + 0.0i + 0.0j + 0.7071067811865475k
+
+julia&gt; rotate([1,0,0], q)
+3-element Array{Float64,1}:
+ 2.220446049250313e-16
+ 1.0
+ 0.0</code></pre><p>In fact, this combination is so useful that the function <code>rotate</code> is overloaded to directly convert from an axis-angle pair.</p><pre><code class="language-julia-repl">julia&gt; rotate([1,0,0], axis=[0,0,1], angle=π/2)
+3-element Array{Float64,1}:
+ 2.220446049250313e-16
+ 1.0
+ 0.0</code></pre><div class="admonition is-info"><header class="admonition-header">Info</header><div class="admonition-body"><p>This version of <a href="../ref-quaternions/#DeformableBodies.Quaternions.rotate"><code>rotate</code></a> also accepts the optional argument <code>center</code>, which defaults to the origin.</p><pre><code class="language-">rotate([1,0,0], axis=[0,0,1], angle=π/2, center=[0,1,0])</code></pre></div></div><h2 id="Converting-between-matrices-and-quaternions-1"><a class="docs-heading-anchor" href="#Converting-between-matrices-and-quaternions-1">Converting between matrices and quaternions</a><a class="docs-heading-anchor-permalink" href="#Converting-between-matrices-and-quaternions-1" title="Permalink"></a></h2><p>Sometimes a rotation may already come represented as a matrix or the transition rotations from <a href="../ref-models/#DeformableBodies.solve!"><code>solve!</code></a> may be needed in matrix form some application. To deal with these cases, the package provides two auxiliary functions <a href="../ref-quaternions/#DeformableBodies.Quaternions.matrixtoquaternion"><code>matrixtoquaternion</code></a> and <a href="../ref-quaternions/#DeformableBodies.Quaternions.quaterniontomatrix"><code>quaterniontomatrix</code></a>.</p><p>To convert a rotation matrix to a unit quaternion, do</p><pre><code class="language-julia-repl">julia&gt; R = [cos(π/4) -sin(π/4) 0;
+            sin(π/4)  cos(π/4) 0;
+            0         0        1]
+3×3 Array{Float64,2}:
+ 0.707107  -0.707107  0.0
+ 0.707107   0.707107  0.0
+ 0.0        0.0       1.0
+
+julia&gt; R * [sqrt(2), 0, 0]
+3-element Array{Float64,1}:
+ 1.0000000000000002
+ 1.0
+ 0.0
+
+julia&gt; q = matrixtoquaternion(R)
+0.9238795325112867 + 0.0i + 0.0j + 0.3826834323650898k
+
+julia&gt; rotate([sqrt(2), 0, 0], q)
+3-element Array{Float64,1}:
+ 0.9999999999999999
+ 1.0
+ 0.0</code></pre><p>Some minor differences may occur due to floating-point rounding errors.</p><div class="admonition is-danger"><header class="admonition-header">Danger</header><div class="admonition-body"><p>The function <a href="../ref-quaternions/#DeformableBodies.Quaternions.matrixtoquaternion"><code>matrixtoquaternion</code></a> assumes that the input is a <em>rotation matrix</em> but, for efficency reasons, no check is done in this regard. If you do not make sure beforehand that the matrix is orthogonal, bad things may happen.</p></div></div><p>To convert a quaternion to a matrix simply do</p><pre><code class="language-julia-repl">julia&gt; q = Quaternion(1,2,3,4)
+1 + 2i + 3j + 4k
+
+julia&gt; R = quaterniontomatrix(q)
+3×3 Array{Float64,2}:
+ -0.666667   0.133333  0.733333
+  0.666667  -0.333333  0.666667
+  0.333333   0.933333  0.133333
+
+julia&gt; rotate([3,0,0], q)
+3-element Array{Float64,1}:
+ -2.0
+  2.0
+  1.0
+
+julia&gt; R * [3,0,0]
+3-element Array{Float64,1}:
+ -2.0
+  2.0
+  1.0</code></pre><p>The function <a href="../ref-quaternions/#DeformableBodies.Quaternions.quaterniontomatrix"><code>quaterniontomatrix</code></a> works for every quaternion, and does not require the input to be a unit quaternion.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>There is a <strong>unique</strong> rotation matrix representing a given quaternion but there are <strong>two</strong> unit quaternions representing the same matrix.</p><p>This means that <code>quaterniontomatrix ∘ matrixtoquaternion</code> equals the identity (disconsidering floating-point rouding errors) but the opposite is not in general true. For a simple example.</p><pre><code class="language-">q = Quaternion(-1.0)
+(matrixtoquaternion ∘ quaterniontomatrix)(q)</code></pre><p>Nevertheless, both these quaternions produce the same rotations.</p></div></div><h2 id="Rotating-a-PointMass-1"><a class="docs-heading-anchor" href="#Rotating-a-PointMass-1">Rotating a PointMass</a><a class="docs-heading-anchor-permalink" href="#Rotating-a-PointMass-1" title="Permalink"></a></h2><p>All the previous functionalities only require the submodule <a href="../ref-quaternions/#DeformableBodies.Quaternions"><code>Quaternions</code></a> and work directly with vectors. Nevertheless, the models on <code>DeformableBodies.jl</code> are constructed with respect to the type <a href="../ref-models/#DeformableBodies.PointMass"><code>PointMass</code></a>. To help with that, the function rotate is overloaded to directly rotate the position of a <code>PointMass</code> without interfering with its mass.</p><pre><code class="language-julia">rotate(p::PointMass, q::Quaternion, center::Vector)
+rotate(p::PointMass; axis::Vector, angle::Real, center::Vector)</code></pre><p>The usage is identical to the version for vectors including the fact that the argument <code>center</code> must be a Vector and not another PointMass.</p><p>An usual application consists in rotating a body around its center of mass.</p><pre><code class="language-julia-repl">julia&gt; body = [ PointMass(rand(), rand(3)) for i in 1:5 ]
+5-element Array{PointMass{Float64},1}:
+ PointMass{Float64}(0.4447546454981455, [0.4519808640305347, 0.9773160631971058, 0.4456462594688728])
+ PointMass{Float64}(0.7641987545351303, [0.40868135444540443, 0.4566215720203233, 0.6926102635787843])
+ PointMass{Float64}(0.06744449922240014, [0.459235238996192, 0.1552244545764141, 0.994958552969935])
+ PointMass{Float64}(0.9398776768618717, [0.5417766070398542, 0.13738995784448016, 0.23019727748917607])
+ PointMass{Float64}(0.5873269180211926, [0.6258089782431482, 0.13310443812968575, 0.42737372962514675])
+
+julia&gt; center_of_mass(body)
+3-element Array{Float64,1}:
+ 0.5068712351259854
+ 0.35717977401676865
+ 0.4501226571147692
+
+julia&gt; q = Quaternion(1,2,3,4)
+1 + 2i + 3j + 4k
+
+julia&gt; rotated = [ rotate(p, q, center_of_mass(body)) for p in body ]
+5-element Array{PointMass{Float64},1}:
+ PointMass{Float64}(0.4447546454981455, [0.6228669628066735, 0.11088983179575818, 1.0100228836318141])
+ PointMass{Float64}(0.7641987545351303, [0.7634143067204577, 0.42023099187120655, 0.5425367225530952])
+ PointMass{Float64}(0.06744449922240014, [0.9112475135809219, 0.7559648136471351, 0.3183971463745292])
+ PointMass{Float64}(0.9398776768618717, [0.2930170666349995, 0.3070963742663819, 0.2272972353751771])
+ PointMass{Float64}(0.5873269180211926, [0.3810201481038761, 0.49599742973082317, 0.27759840099392974])
+
+julia&gt; center_of_mass(rotated)
+3-element Array{Float64,1}:
+ 0.5068712351259854
+ 0.3571797740167687
+ 0.4501226571147692</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-cubecopter/">« Tutorial</a><a class="docs-footer-nextpage" href="../ref-quaternions/">Quaternions »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 14 March 2020 21:41">Saturday 14 March 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
