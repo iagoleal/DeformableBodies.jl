@@ -34,8 +34,8 @@ Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
 ## Science behind the camera
 This package is based on a scientific initiation
 that I did with [Prof. Alejandro Cabrera](http://www.im.ufrj.br/alejandro/)
-while a undergraduate at UFRJ.
-Everything in here is based on Alejandro's [paper](https://arxiv.org/abs/math-ph/0611051)
+while an undergraduate at UFRJ.
+Everything in here is based on Alejandro's [paper](https://arxiv.org/abs/math-ph/0611051):
 
 * Cabrera, Alejandro. “A Generalized Montgomery Phase Formula for Rotating Self-Deforming Bodies.” Journal of Geometry and Physics 57.5 (2007): 1405–1420. Crossref. Web.
 

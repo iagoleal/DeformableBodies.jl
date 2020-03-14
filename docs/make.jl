@@ -56,6 +56,8 @@ makedocs(
 )
 
 # Deploy site to Github Pages
-deploydocs(
-    repo = "github.com/iagoleal/DeformableBodies.jl.git",
-)
+if !("local" in ARGS)
+    deploydocs(
+        repo = "github.com/iagoleal/DeformableBodies.jl.git"
+    )
+end

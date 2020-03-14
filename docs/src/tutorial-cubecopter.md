@@ -112,10 +112,10 @@ It is now time to define the problem's model and find the trajectory on the _ine
 First, we need to define some initial data.
 
 ```@example cube
-tstart = 0.
-tend   = 5.
-initial_rotation = one(Quaternion)
-initial_angular_momentum = zeros(3)
+tstart  = 0.                # Starting time
+tend    = 5.                # Ending time
+Rstart  = one(Quaternion)   # Initial rotation
+Lcm     = zeros(3)          # Angular momentum as viewed from center of mass
 nothing; #hide
 ```
 
@@ -125,9 +125,9 @@ The other two variables are the initial data necessary to solve the differential
 The term `one(Quaternion)` is our way to represent the identity rotation,
 meaning that at the starting time,
 the inertial frame coincides with the body frame.
-The variable `initial_angular_momentum` is set to zero,
-meaning that at the beginning of the trajectory,
-the body has zero angular momentum from the point of view of the inertial frame.
+The variable `L_cm` is set to zero,
+meaning that the total angular momentum is zero
+from the point of view of the center of mass.
 
 With this information, we are ready to define our [`Model`](@ref).
 
@@ -135,8 +135,8 @@ With this information, we are ready to define our [`Model`](@ref).
 model = Model( trajectories
              , tstart
              , tend
-             , initial_rotation
-             , initial_angular_momentum
+             , Rstart
+             , Lcm
              )
 nothing; #hide
 ```
