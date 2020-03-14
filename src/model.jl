@@ -64,7 +64,7 @@ function solve!(m::Model; reltol=1e-8, abstol=1e-8, solver=ODE.Tsit5())
     # Evolution of angular momentum
     m.momentum = t -> solution(t)[5:end]
     # Store solution on model
-    m.inertialframe = t -> map(x -> rotate(x, m.rotation(t)), m.bodyframe(t))
+    m.inertialframe = t -> map(x -> rotate(x, m.rotation(t), center_of_mass(m.bodyframe(t))), m.bodyframe(t))
     return m.inertialframe, m.rotation, m.momentum
 end
 
