@@ -24,18 +24,16 @@ function Model(trajectories::Array{Function,1}, t_min, t_max, q_0, L_cm)
 end
 
 function eq_of_motion!(du,u,trajectories,t)
-    q = Quaternion(u[1:4])
-    Π = u[5:end]
-    # Change particles to SoR with CM at origin
-    r = centralize(trajectories(t))
-    # Velocities must be calculated using a fixed SoR, so we don't centralize here
-    v = velocity(trajectories, t)
-    Iinv = (inv ∘ inertia_tensor)(r)
-    L = angular_momentum(r, v)
-    ω = Iinv * (Π - L)
+    q    = Quaternion(u[1:4])        # Rotation variable
+    Π    = u[5:end]                  # Momentum variable
+    r    = trajectories(t)           # Position
+    v    = velocity(trajectories, t) # Velocity
+    Iinv = (inv ∘ inertia_tensor)(r) # Inverse of moment of inertia
+    L    = angular_momentum(r, v)    # Angular momentum
+    ω    = (Iinv * (Π - L))          # Angular velocity
 
     dq = 0.5 * q * Quaternion(ω)
-    dΠ = Π × (Iinv * (Π - L))
+    dΠ = Π × ω
 
     du[1:4]   .= components(dq)
     du[5:end] .= dΠ
@@ -44,9 +42,9 @@ end
 
 @inline construct_problem(m::Model) =
     ODE.ODEProblem(eq_of_motion!
-                   , vcat(components(m.q_0), rotate(m.L_cm, conj(m.q_0)))
-                  , (m.t_min, m.t_max)
-                  , m.bodyframe
+                  , vcat(components(m.q_0), rotate(m.L_cm, conj(m.q_0))) # Initial conditions
+                  , (m.t_min, m.t_max)       # timespan
+                  , centralize ∘ m.bodyframe # Movement must be centered on cm
                   )
 
 """
