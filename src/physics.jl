@@ -99,8 +99,8 @@ is fixed on the origin.
 # Extend Quaternions.rotate to deal with point masses
 using .Quaternions: rotate
 
-@inline Quaternions.rotate(x::PointMass, q::Quaternion) =
-    PointMass(mass(x), Quaternions.rotate(pos(x), q))
+@inline Quaternions.rotate(x::PointMass, q::Quaternion, center=zeros(3)) =
+    PointMass(mass(x), Quaternions.rotate(pos(x), q, center))
 
-@inline Quaternions.rotate(x::PointMass; angle, axis) =
-     PointMass(mass(x), Quaternions.rotate(pos(x); angle=angle, axis=axis))
+@inline Quaternions.rotate(x::PointMass; angle, axis, center=zeros(3)) =
+    PointMass(mass(x), Quaternions.rotate(pos(x); axis=axis, angle=angle, center=center))

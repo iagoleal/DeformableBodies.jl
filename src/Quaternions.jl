@@ -354,24 +354,25 @@ end
 # https://arxiv.org/pdf/math/0701759.pdf
 
 """
-    rotate(v::Vector, q::Quaternion)
-    rotate(v::Vector; axis, angle)
+    rotate(v::Vector, q::Quaternion, center=zeros(3))
+    rotate(v::Vector; axis, angle, center=zeros(3))
 
-Rotate a vector `v` by a quaternion `q`.
+Rotate a vector `v` by a quaternion `q` around a central point `center`.
 The quaternion may be given directly or as an axis and an angle.
+The point `pt` is optional and defaults to the origin.
 """
 function rotate end
 
-function rotate(v, q::Quaternion)
+function rotate(v, q::Quaternion, center=zeros(3))
     if length(v) != 3
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
     q = normalize(q)
-    return imag(q * Quaternion(0, v) * conj(q))
+    return imag(q * Quaternion(0, v - center) * conj(q)) + center
 end
 
-@inline function rotate(v; axis, angle)
-    return rotate(v, axistoquaternion(axis, angle))
+@inline function rotate(v; axis, angle, center=zeros(3))
+    return rotate(v, axistoquaternion(axis, angle), center)
 end
 
 end
