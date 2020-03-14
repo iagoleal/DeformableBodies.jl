@@ -316,8 +316,9 @@ function quaterniontomatrix(q::Quaternion)
     q = normalize(q)
     t = real(q)
     v = imag(q)
+    s = 1 / abs2(q)
     v_cross =  _crossmatrix(v)
-    return kron(v',v) + t^2*I + 2*t*v_cross + v_cross^2
+    return s * (kron(v',v) + t^2*I + 2*t*v_cross + v_cross^2)
 end
 
 # Skew-symmetric matrix equivalent to cross product from the left
@@ -367,8 +368,7 @@ function rotate(v, q::Quaternion, center=zeros(3))
     if length(v) != 3
         error("Error: Quaternions only rotate 3-dimensional vectors.\nDimension given is $(length(v))")
     end
-    q = normalize(q)
-    return imag(q * Quaternion(0, v - center) * conj(q)) + center
+    return imag(q * Quaternion(0, v - center) * conj(q)) / abs2(q) + center
 end
 
 @inline function rotate(v; axis, angle, center=zeros(3))
