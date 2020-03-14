@@ -47,6 +47,7 @@ makedocs(
     pages    = [
         "Introduction" => "index.md",
         "Tutorial" => "tutorial-cubecopter.md",
+        "Guides" => ["guide-quaternions.md"],
         "Reference" => [
             "Quaternions" => "ref-quaternions.md",
             "DeformableBodies" => "ref-models.md"

@@ -328,12 +328,12 @@ end
     matrixtoquaternion(R)
 
 Given a rotation matrix `R`,
-return a quaternion `q` such that `rotate(v,q) = R*v` for all `v`.
+return a unit quaternion `q` such that `rotate(v,q) = R*v` for all `v`.
 
 The matrix `R` is assumed to be orthogonal
 but, for efficiency reasons, no check is made to guarantee that.
 
-Since there are, in general, two quaternions representing the same rotation matrix,
+Since there are, in general, two unit quaternions representing the same rotation matrix,
 it is not guaranteed that `matrixtoquaternion ∘ quaterniontomatrix` equals the identity.
 """
 function matrixtoquaternion(r)
