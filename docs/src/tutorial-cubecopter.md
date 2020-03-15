@@ -74,10 +74,9 @@ Our chosen trajectory will be a stationary cube with an helix rotating counter-c
 For the cube part, we represent these as constant functions.
 
 ```@example cube
-# Define an array of trajectories
-trajectories = Function[]
+trajectory = Function[]
 for x in r_0[1:end-2]
-    push!(trajectories, let x=x; t -> x;end)
+    push!(trajectory, let x=x; t -> x;end)
 end
 nothing; #hide
 ```
@@ -90,7 +89,7 @@ const ω = 2*π/5.0            # Angular velocity
 const z_axis  = [0., 0., 1.] # Axis of rotation is orthogonal to helix
 
 for x in r_0[end-1:end]
-    push!(trajectories, let x=x; t -> rotate(x, axis=z_axis, angle=ω*t); end)
+    push!(trajectory, let x=x; t -> rotate(x, axis=z_axis, angle=ω*t); end)
 end
 nothing; #hide
 ```
@@ -103,7 +102,7 @@ Let's animate it so we can see how the trajectory behaves.
 using Plots: Animation, frame, gif
 anime = Animation()
 for t in 0.:0.1:7.
-    frame(anime, plot([ x(t) for x in trajectories], bodylines=edges))
+    frame(anime, plot([ x(t) for x in trajectory], bodylines=edges))
 end
 gif(anime)
 ```

@@ -67,7 +67,7 @@ rotate([1,2,3], q)
 The composition of rotations translates to the quaternion world
 as the product of quaternions.
 Thus, it is the same to rotate a vector by ``q_1`` and then by ``q_2``
-and to rotate by ``q_2 * q_1``.
+and to rotate by ``q_2\,q_1``.
 
 ```@repl quat
 v = [9, 0, 0]
