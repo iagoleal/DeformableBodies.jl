@@ -2,7 +2,7 @@
 
 | **Documentation**                 |
 |:--------------------------------: |
-| [![][docs-dev-img]][docs-dev-url] |
+| [![][docs-stable-img]][docs-stable-url]  [![][docs-dev-img]][docs-dev-url] |
 
 
 `DeformableBodies.jl` is a Julia package dedicated
@@ -17,5 +17,7 @@ import Pkg
 Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
 ```
 
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://iagoleal.github.io/DeformableBodies.jl/stable/
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://iagoleal.github.io/DeformableBodies.jl/dev/
