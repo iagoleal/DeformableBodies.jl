@@ -1,7 +1,7 @@
 name = "DeformableBodies"
 uuid = "e53d2b94-6236-11e9-2d7b-535d79ecd3d3"
 authors = ["Iago Leal de Freitas"]
-version = "0.0.1"
+version = "0.1.0"
 
 [deps]
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
