@@ -37,7 +37,7 @@ end
 # Create the model
 model = Model( bodies
              , 0.
-             , 7.
+             , tmax
              , one(Quaternion)
              , zeros(3)
              )
@@ -64,5 +64,6 @@ anim = plotmodel( model, :both
                 , bodylines=bodylines
                 , duration=tmax
                 , markercolor=:purple
+                , size=(800,400)
                 , saveas="cubecopter.gif"
                 )

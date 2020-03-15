@@ -5,53 +5,66 @@ using DeformableBodies
 
 # Initial values for the body
 const r_0 = centralize(
-    [ PointMass(3.,  [0.,   0.,   0.])   # centro do corpo
-    , PointMass(2.,  [0.,  -1.,   0.])   # parte de trás
-    , PointMass(1.,  [ .5, -1.,   1.])   # pata tras 1
-    , PointMass(1.,  [-.5, -1.,   1.])   # pata tras 2
-    , PointMass( .2, [0.,  -1.5, -0.5])  # cauda
-    , PointMass(2.,  [0.,   1.,   0.])   # parte da frente
-    , PointMass(1.,  [ .5,  1.,   1.])   # pata frente 1
-    , PointMass(1.,  [-.5,  1.,   1.])   # pata frente 2
-    , PointMass(1.3, [0.,   1.2, -0.2])  # cabeça
-    ])
+    [ PointMass(3.,  [0.,   0.,   0.])   # torso center
+    , PointMass(2.,  [0.,  -1.,   0.])   # torso back
+    , PointMass(1.,  [ .5, -1.,   1.])   # left back leg
+    , PointMass(1.,  [-.5, -1.,   1.])   # right back leg
+    , PointMass(.2,  [0.,  -1.5, -0.5])  # tail
+    , PointMass(2.,  [0.,   1.,   0.])   # torso front
+    , PointMass(1.,  [ .5,  1.,   1.])   # left front leg
+    , PointMass(1.,  [-.5,  1.,   1.])   # right front leg
+    , PointMass(1.5, [0.,   1.2, -0.2])  # head
+   ])
 
-# Define vector of trajectories
-bodies = Function[]
-# Cat's center does not move
-push!(bodies, t -> r_0[1])
+# Parameters
+const tmax    = 15.0                  # Time of complete motion
+const tmax_r1 = tmax/15               # Time of bending part
+const tmax_r2 = tmax - tmax_r1        # Time of unbending part
+const θmax    = -π/6.0                # Bending angle
+const ω_1     = θmax/tmax_r1          # (un)Bending frequency
+const ω_2     = 6.4*π/tmax              # Rotation frequency
+const ω_3     = ω_2/2                 # Rotation frequency
 
-# Other parts move according to given rule
-const tmax = 10.0
-const tmax_r1 = tmax/20.0
-const θmax = -π/6.0
-const freq = 2*π/(tmax - tmax_r1)
-for i in 2:9
-    if i in (2,3,4,5)
-        e_1 = [1.,0.,0.]
-        ax  = rotate(pos(r_0[2]) - pos(r_0[1]), axis=e_1, angle=θmax)
-    elseif i in (6,7,8,9)
-        e_1 = -[1.,0.,0.]
-        ax  = -rotate(pos(r_0[6]) - pos(r_0[1]), axis=e_1, angle=θmax)
+function cat(t)
+    body = copy(r_0)
+    # Bend the torso
+    for i in 2:9
+        if i in (2,3,4,5)
+            ax = [1.,0.,0.]
+        elseif i in (6,7,8,9)
+            ax = -[1.,0.,0.]
+        end
+        body[i] = rotate(body[i], axis=ax, angle=ω_1*min(t,tmax_r1), center=pos(body[1]))
     end
-    ri(t) = let j = i
-        if t < tmax_r1
-            rotate(r_0[j], axis=e_1, angle=t*θmax/tmax_r1)
-        elseif tmax_r1 < t < tmax
-            rx = rotate(r_0[j], axis=e_1, angle=θmax)
-            rotate(rx, axis=ax, angle=freq*(t-tmax_r1))
-        else
-            rx = rotate(r_0[j], axis=e_1, angle=θmax)
-            rotate(rx, axis=ax, angle=freq*(tmax-tmax_r1))
+    # Total rotation
+    body = map(x -> rotate(x, axis=[0,1,0], angle = ω_3*min(t,tmax), center=center_of_mass(body)), body)
+    # Legs rotation
+    for i in 2:9
+        if i in (2,3,4,5)
+            ax = pos(body[2]) - pos(body[1])
+        elseif i in (6,7,8,9)
+            ax = pos(body[1]) - pos(body[6])
+        end
+        body[i] = rotate(body[i], axis=ax, angle=ω_2 * min(t,tmax), center=pos(body[1]))
+    end
+    # Unbend torso
+    if t >= tmax_r2
+        for i in 2:9
+            if i in (2,3,4,5)
+                ax = [1.,0.,0.]
+            elseif i in (6,7,8,9)
+                ax = -[1.,0.,0.]
+            end
+            body[i] = rotate(body[i], axis=ax, angle=ω_1*(min(t,tmax)-tmax_r2), center=pos(body[1]))
         end
     end
-    push!(bodies, ri)
+    return body
 end
 
 # Create a model
-model = Model( bodies
+model = Model( cat
              , 0.
-             , 10.
+             , tmax + 1.5
              , one(Quaternion)
              , zeros(3)
              )
@@ -78,5 +91,5 @@ println("Inertial frame      : model.inertialframe")
 println("\nSaving animation to \"gato.gif\"")
 anim = plotmodel(model, :both,
                  bodylines=bodylines,
-                 duration=tmax,
+                 size=(800,400),
                  saveas="gato.gif")
