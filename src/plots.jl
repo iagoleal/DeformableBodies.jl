@@ -42,7 +42,7 @@ Receive a [`Model`](@ref) and return a `Plots.Animation` from its data.
 
 - `SoR`: means "system of reference" and accepts one of the following symbols: `:bodyframe`, `:inertialframe`, `:both`.
 - `fps`: frames per second. Default is `24`.
-- `duration`: length of animation in seconds. Default is `model.t_max`.
+- `duration`: length of animation in seconds. Default is the total timespan stored in `m`.
 - `saveas`: filename to save animation, supported extensions are gif, mp4 or mov. If left blank, file is not saved.
 - `bodylines`: Array of points pairs. Stores the data who says which points should be linked. Default is empty.
 - `markersize_is_mass`: Says if attribute `markersize` should be weighted by the mass of each particle. Default is `true`.
@@ -59,7 +59,7 @@ julia> plotmodel(m, :both, fps=15, saveas="example.gif", color=:green,viewangle=
 function plotmodel( m::Model
                   , SoR # System of Reference
                   ; fps=24
-                  , duration=m.t_max
+                  , duration=m.timespan[2]-m.timespan[1]
                   , saveas=nothing
                   , bodylines=nothing
                   , markersize_is_mass=true
@@ -74,7 +74,7 @@ function plotmodel( m::Model
 
     # Build the animation
     anime = Plots.Animation()
-    for t in range(m.t_min, m.t_max, length=frames)
+    for t in range(m.timespan[1], m.timespan[2], length=frames)
         plt =
             if SoR == :inertialframe
                 Plots.plot(m.inertialframe(t),
@@ -125,7 +125,7 @@ end
 function getframelimits(m::Model, SoR, frames)
     local lim_min = [Inf, Inf, Inf]
     local lim_max = [-Inf, -Inf, -Inf]
-    for t in range(m.t_min, m.t_max, length=frames)
+    for t in range(m.timespan[1], m.timespan[2], length=frames)
         if SoR == :bodyframe
             x = m.bodyframe(t)
         elseif SoR == :inertialframe

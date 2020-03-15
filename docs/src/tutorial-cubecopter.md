@@ -115,7 +115,7 @@ First, we need to define some initial data.
 tstart  = 0.                # Starting time
 tend    = 5.                # Ending time
 Rstart  = one(Quaternion)   # Initial rotation
-Lcm     = zeros(3)          # Angular momentum as viewed from center of mass
+L_cm    = zeros(3)          # Angular momentum as viewed from center of mass
 nothing; #hide
 ```
 
@@ -132,11 +132,10 @@ from the point of view of the center of mass.
 With this information, we are ready to define our [`Model`](@ref).
 
 ```@example cube
-model = Model( trajectories
-             , tstart
-             , tend
-             , Rstart
-             , Lcm
+model = Model( trajectory
+             , timespan = (tstart, tend)
+             , q_0  = Rstart
+             , L_cm = L_cm
              )
 nothing; #hide
 ```

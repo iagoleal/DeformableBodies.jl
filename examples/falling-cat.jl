@@ -63,14 +63,13 @@ end
 
 # Create a model
 model = Model( cat
-             , 0.
-             , tmax + 1.5
-             , one(Quaternion)
-             , zeros(3)
+             , timespan = (0., tmax + 1.5)
+             , q_0      = one(Quaternion)
+             , L_cm     = zeros(3)
              )
 println(model)
 # And solve it
-rotbodies, R, L = solve!(model)
+solve!(model)
 
 # Lines to connect different parts of the body
 # (Only important for plotting)

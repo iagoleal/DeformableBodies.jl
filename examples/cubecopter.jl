@@ -36,14 +36,13 @@ end
 
 # Create the model
 model = Model( bodies
-             , 0.
-             , tmax
+             , (0., tmax)
              , one(Quaternion)
              , zeros(3)
              )
 println(model)
 # And solve it
-_, rotations, momentum = solve!(model)
+solve!(model)
 
 # Lines to connect different parts of the body
 # (Only important for plotting)
