@@ -1,5 +1,3 @@
-using LinearAlgebra: I, cross, ×
-
 """
     PointMass(m, x)
 

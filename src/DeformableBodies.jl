@@ -14,6 +14,8 @@ export components,
        matrixtoquaternion,
        rotate
 
+using LinearAlgebra: I, cross, ×
+
 # Physical utilities
 include("physics.jl")
 
