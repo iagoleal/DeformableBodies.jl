@@ -67,7 +67,7 @@ cm(x) = \frac{1}{\sum m_i}\sum m_i x_i.
 Receive a system of [`PointMass`](@ref)es
 and return their inertia tensor through formula
 ```math
-I(x) = \sum m_i \langle x_i, x_i \rangle \mathrm{id} - x_i \otimes x_i.
+I(x) = \sum m_i \Big( \langle x_i, x_i \rangle \mathrm{id} - x_i \otimes x_i \Big).
 ```
 """
 @inline inertia_tensor(xs) =
