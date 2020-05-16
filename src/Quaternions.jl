@@ -10,7 +10,8 @@ $(EXPORTS)
 """
 module Quaternions
 
-using Base: promote_rule, widen, float, big, show
+using Base: promote_rule, widen, float, big
+using Base: show, show_unquoted
 using Base: ==, +, -, *, /, \
 using Base: isreal, isinteger, isfinite, isnan, isinf
 using Base: real, imag, conj, conj!, abs2, abs, inv, exp, log, angle
@@ -40,7 +41,7 @@ This type overloads all the arithmetic operations
 as well as the methods defined for Complex numbers
 that still make sense for Quaternions.
 """
-struct Quaternion{T} <:Number where {T<:Real}
+struct Quaternion{T} <: Number where {T<:Real}
     q::Array{T, 1}
     function Quaternion{T}(x::AbstractVector) where T <: Real
         if length(x) == 4
@@ -275,7 +276,7 @@ function Base.show(io::IO, q::Quaternion)
 end
 
 # Puts parentheses around quaternion on expressions
-function show_unquoted(io::IO, q::Quaternion, ::Int, prec::Int)
+function Base.show_unquoted(io::IO, q::Quaternion, ::Int, prec::Int)
     if operator_precedence(:+) <= prec
         print(io, "(")
         show(io, q)
