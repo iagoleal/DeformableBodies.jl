@@ -1,11 +1,12 @@
 module DeformableBodies
 
-# Quaternions definitions
+# Independent submodule
 include("Quaternions.jl")
 using .Quaternions
 
 export Quaternion
-export components,
+export quaternion,
+       components,
        imagq,
        axis,
        normalize,
@@ -13,6 +14,8 @@ export components,
        quaterniontomatrix,
        matrixtoquaternion,
        rotate
+
+## Main functions and definitions ##
 
 using LinearAlgebra: I, cross, ×
 

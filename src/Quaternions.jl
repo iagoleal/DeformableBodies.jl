@@ -20,7 +20,8 @@ using LinearAlgebra: I
 using DocStringExtensions
 
 export Quaternion
-export components,
+export quaternion,
+       components,
        imagq,
        axis,
        normalize,
@@ -79,6 +80,12 @@ Base.float(::Type{Quaternion{T}}) where {T} = Quaternion{float(T)}
 
 Base.big(::Type{Quaternion{T}}) where {T<:Real} = Quaternion{big(T)}
 Base.big(q::Quaternion{T}) where {T<:Real} = Quaternion{big(T)}(q)
+
+
+quaternion(q::Quaternion) = q
+quaternion(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) = Quaternion(t,x,y,z)
+quaternion(::Type{T}) where {T<:Real} = Quaternion{T}
+quaternion(::Type{Quaternion{T}}) where {T<:Real} = Quaternion{T}
 
 ##############
 # Components #
