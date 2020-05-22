@@ -102,31 +102,31 @@ julia&gt; R * [3,0,0]
 (matrixtoquaternion ∘ quaterniontomatrix)(q)</code></pre><p>Nevertheless, both these quaternions produce the same rotations.</p></div></div><h2 id="Rotating-a-PointMass-1"><a class="docs-heading-anchor" href="#Rotating-a-PointMass-1">Rotating a PointMass</a><a class="docs-heading-anchor-permalink" href="#Rotating-a-PointMass-1" title="Permalink"></a></h2><p>All the previous functionalities only require the submodule <a href="../ref-quaternions/#DeformableBodies.Quaternions"><code>Quaternions</code></a> and work directly with vectors. Nevertheless, the models on <code>DeformableBodies.jl</code> are constructed with respect to the type <a href="../ref-models/#DeformableBodies.PointMass"><code>PointMass</code></a>. To help with that, the function rotate is overloaded to directly rotate the position of a <code>PointMass</code> without interfering with its mass.</p><pre><code class="language-julia">rotate(p::PointMass, q::Quaternion, center::Vector)
 rotate(p::PointMass; axis::Vector, angle::Real, center::Vector)</code></pre><p>The usage is identical to the version for vectors including the fact that the argument <code>center</code> must be a Vector and not another PointMass.</p><p>An usual application consists in rotating a body around its center of mass.</p><pre><code class="language-julia-repl">julia&gt; body = [ PointMass(rand(), rand(3)) for i in 1:5 ]
 5-element Array{PointMass{Float64},1}:
- PointMass{Float64}(0.05071090712101611, [0.18790800946910768, 0.6211893431382398, 0.5857428537866369])
- PointMass{Float64}(0.7057033913416466, [0.7239368374962354, 0.7732514973402302, 0.9448045404502119])
- PointMass{Float64}(0.39719646507628514, [0.5026356065221405, 0.17760541336383828, 0.053834037047008065])
- PointMass{Float64}(0.3730679086180777, [0.4034011999427174, 0.3473835238287466, 0.9091191231223636])
- PointMass{Float64}(0.39734313268121846, [0.36421044974644223, 0.4355201145286145, 0.04036343757214067])
+ PointMass{Float64}(0.765927525865411, [0.3837946129810037, 0.9742865699166063, 0.09317084615970228])
+ PointMass{Float64}(0.42799974535824536, [0.2376083035596659, 0.45753809614674923, 0.05485668938798338])
+ PointMass{Float64}(0.10575346739998226, [0.4258396211377107, 0.10043453842957728, 0.9613697043610083])
+ PointMass{Float64}(0.6039396718374714, [0.41070053468898027, 0.08289563229109853, 0.9935995095239765])
+ PointMass{Float64}(0.557571990222733, [0.7373178285746542, 0.9369557655518228, 0.6295158666337226])
 
 julia&gt; center_of_mass(body)
 3-element Array{Float64,1}:
- 0.5276818139934161
- 0.4939549491953577
- 0.5577064204792636
+ 0.4468709082695784
+ 0.6196852561370441
+ 0.46627135712644535
 
 julia&gt; q = Quaternion(1,2,3,4)
 1 + 2i + 3j + 4k
 
 julia&gt; rotated = [ rotate(p, q, center_of_mass(body)) for p in body ]
 5-element Array{PointMass{Float64},1}:
- PointMass{Float64}(0.05071090712101611, [0.7917223206274131, 0.24371857040310696, 0.5669387777588338])
- PointMass{Float64}(0.7057033913416466, [0.7179566260562149, 0.7897581954629119, 0.9354146225782107])
- PointMass{Float64}(0.39719646507628514, [0.13269293301307655, 0.2467924005368435, 0.18691513342178623])
- PointMass{Float64}(0.3730679086180777, [0.8486953485832738, 0.6942334833791624, 0.42633457913927364])
- PointMass{Float64}(0.39734313268121846, [0.24948655807060938, 0.05955699598154096, 0.3796977223203622])
+ PointMass{Float64}(0.765927525865411, [0.26259490559029164, 0.2107002807069781, 0.7264604167622795])
+ PointMass{Float64}(0.42799974535824536, [0.26305560040260867, 0.2599494611682261, 0.19032451720040433])
+ PointMass{Float64}(0.10575346739998226, [0.7547304586351742, 1.1088135354413298, 0.04064003785346215])
+ PointMass{Float64}(0.6039396718374714, [0.7861198525687072, 1.126053649963648, 0.023521337329700964])
+ PointMass{Float64}(0.557571990222733, [0.41525500296016843, 0.8163893728736865, 0.8809720739495678])
 
 julia&gt; center_of_mass(rotated)
 3-element Array{Float64,1}:
- 0.527681813993416
- 0.49395494919535754
- 0.5577064204792636</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-cubecopter/">« Tutorial</a><a class="docs-footer-nextpage" href="../ref-quaternions/">Quaternions »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 19 May 2020 18:22">Tuesday 19 May 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0.4468709082695784
+ 0.6196852561370442
+ 0.46627135712644535</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-cubecopter/">« Tutorial</a><a class="docs-footer-nextpage" href="../ref-quaternions/">Quaternions »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 22 May 2020 03:56">Friday 22 May 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
