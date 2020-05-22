@@ -8,6 +8,7 @@ This module is independent from the remainder of DeformableBodies.jl.
 ```@docs
 Quaternions
 Quaternion
+quaternion
 components
 imagq
 axis

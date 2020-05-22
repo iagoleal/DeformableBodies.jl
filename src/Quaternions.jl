@@ -81,9 +81,45 @@ Base.float(::Type{Quaternion{T}}) where {T} = Quaternion{float(T)}
 Base.big(::Type{Quaternion{T}}) where {T<:Real} = Quaternion{big(T)}
 Base.big(q::Quaternion{T}) where {T<:Real} = Quaternion{big(T)}(q)
 
+"""
+    quaternion(t [,x, y, z])
 
+Convert a real number or an array of real numbers
+to quaternion.
+
+# Examples
+
+```jldoctest
+julia> quaternion(42)
+42 + 0i + 0j + 0k
+
+julia> quaternion([1,2,3])
+3-element Array{Quaternion{Int64},1}:
+ 1 + 0i + 0j + 0k
+ 2 + 0i + 0j + 0k
+ 3 + 0i + 0j + 0k
+```
+"""
 quaternion(q::Quaternion) = q
 quaternion(t::Real, x::Real = 0, y::Real = 0, z::Real = 0) = Quaternion(t,x,y,z)
+quaternion(A::AbstractArray{<:Quaternion}) = A
+quaternion(A::AbstractArray{<:Real}) = quaternion.(A)
+
+"""
+    quaternion(T::Type)
+
+Return a type representing a quaternion
+whose components have type `T`.
+
+# Examples
+```jldocstring
+julia> quaternion(Quaternion{Float64})
+Quaternion{Float64}
+
+julia> quaternion(Float64)
+Quaternion{Float64}
+```
+"""
 quaternion(::Type{T}) where {T<:Real} = Quaternion{T}
 quaternion(::Type{Quaternion{T}}) where {T<:Real} = Quaternion{T}
 
