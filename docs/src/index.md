@@ -24,11 +24,10 @@ and from an inertial frame.
 
 ## Installation
 This package can be installed using the Julia Package Manager.
-Simply open the REPL and run
+Simply open the REPL, enter `]` and run
 
 ```julia
-import Pkg
-Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
+pkg> add DeformableBodies
 ```
 
 ## Science behind the camera

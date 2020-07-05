@@ -10,11 +10,10 @@ to the study and solution of a special class of problems from classical mechanic
 _deformable bodies_.
 
 ## Installation
-You can install this package via the following commands inside the Julia REPL:
-
+You can install this package by entering `]` on the Julia REPL
+and then running
 ```julia
-import Pkg
-Pkg.add("https://github.com/iagoleal/DeformableBodies.jl.git")
+pkg> add DeformableBodies
 ```
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
