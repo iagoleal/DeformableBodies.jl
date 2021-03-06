@@ -1,8 +1,8 @@
 # DeformableBodies.jl
 
-| **Documentation** | **Build Status** | **Code Coverage** |
-|:-----------------:|:----------------:|:-----------------:|
-| [![Stable Docs][docs-stable-img]][docs-stable-url]  [![Latest Docs][docs-dev-img]][docs-dev-url] | [![Build Status][build-img]][build-url] | [![Code Coverage][codecov-img]][codecov-url] |
+| **Documentation** | **Build Status** |
+|:-----------------:|:----------------:|
+| [![Stable Docs][docs-stable-img]][docs-stable-url]  [![Latest Docs][docs-dev-img]][docs-dev-url] | [![Build Status][build-img]][build-url] [![Code Coverage][codecov-img]][codecov-url] |
 
 `DeformableBodies.jl` is a Julia package offering tools for
 modeling and solving a special class of problems from classical mechanics
@@ -33,8 +33,8 @@ There are also some complete working examples on the `examples/` folder.
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://iagoleal.github.io/DeformableBodies.jl/dev/
 
-[build-img]: https://travis-ci.org/iagoleal/DeformableBodies.jl.svg?branch=master
-[build-url]: https://travis-ci.org/iagoleal/DeformableBodies.jl
+[build-img]: https://github.com/iagoleal/DeformableBodies.jl/actions/workflows/ci.yml/badge.svg?branch=master
+[build-url]: https://github.com/iagoleal/DeformableBodies.jl/actions/workflows/ci.yml
 
 [codecov-img]: https://codecov.io/github/iagoleal/DeformableBodies.jl/coverage.svg?branch=master
 [codecov-url]: https://codecov.io/github/iagoleal/DeformableBodies.jl?branch=master
