@@ -1,8 +1,18 @@
 # Deformable Bodies Dynamics
 
-`DeformableBodies.jl` is a Julia package dedicated
-to the study and solution of a special class of problems from classical mechanics:
-_deformable bodies_.
+A common problem that appears in engineering and mechanical systems
+consists of studying the possible motions of a given body
+in a controlled setting, such as in a lab,
+and then trying to understand what will be the body’s motion “in the wild”,
+such as when viewed from an inertial frame of reference.
+Examples where this happens are satellites self-adjusting in space
+or the complicated moves a cat does to right itself midair.
+
+`DeformableBodies.jl` is a Julia package dedicated to
+aid in the construction and simulation of such problems.
+It allows the user to enter the body's motion
+as seem from an arbitrary frame of reference
+and calculates the motion from the perspective of an inertial frame.
 
 The data needed for solving a deformable body problem
 consists of the body trajectory with respect to an arbitrary reference frame.
