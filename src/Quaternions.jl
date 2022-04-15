@@ -5,7 +5,6 @@ Quaternions are a 4-dimensional normed division algebra which extend the complex
 They may be used as a representation of rotations on 3-dimensional space.
 
 # Exports
-$(EXPORTS)
 
 """
 module Quaternions
@@ -94,7 +93,7 @@ julia> quaternion(42)
 42 + 0i + 0j + 0k
 
 julia> quaternion([1,2,3])
-3-element Array{Quaternion{Int64},1}:
+3-element Vector{Quaternion{Int64}}:
  1 + 0i + 0j + 0k
  2 + 0i + 0j + 0k
  3 + 0i + 0j + 0k
@@ -136,7 +135,7 @@ Return an array with the components of a [`Quaternion`](@ref).
 # Example
 ```jldoctest
 julia> components(Quaternion(1.0, 2.0, 3.0, 4.0))
-4-element Array{Float64,1}:
+4-element Vector{Float64}:
  1.0
  2.0
  3.0
@@ -191,7 +190,7 @@ julia> Quaternion(10,1,1,0.5)
 10.0 + 1.0i + 1.0j + 0.5k
 
 julia> axis(Quaternion(10,1,1,0.5))
-3-element Array{Float64,1}:
+3-element Vector{Float64}:
  0.6666666666666666
  0.6666666666666666
  0.3333333333333333
